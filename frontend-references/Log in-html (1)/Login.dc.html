@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Log in · Quillo</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2efea}
+a{color:#6b4a2b}a:hover{color:#4a3119}
+.lg{--ease:cubic-bezier(.2,.7,.2,1);--t-fast:200ms;--t-reveal:600ms;--t-scene:1.2s;
+  --bg:#f2efea;--sf:#ffffff;--bd:#d9d3cb;--tx:#1f1a14;--mu:#5c534a;--ac:#6b4a2b;--ai:#ffffff;--ok:#2f6b45;
+  font-family:'Figtree',system-ui,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh;display:flex;flex-wrap:wrap;overflow-x:clip;position:relative}
+.lg *{box-sizing:border-box}
+.lg ::selection{background:var(--ac);color:var(--ai)}
+.lg :focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+.lg :focus:not(:focus-visible){outline:none}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:500}
+.pic{position:relative;flex:1 1 53%;min-height:100vh;overflow:hidden;background:#605650;cursor:crosshair}
+.pic > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vig{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity var(--t-reveal) var(--ease);background:radial-gradient(ellipse 40% 26% at 68% 82%,transparent 0,transparent 55%,rgba(15,10,5,.72) 100%)}
+.vig.on{opacity:1}
+.chip{position:absolute;left:28px;top:28px;z-index:4;display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 16px;border-radius:999px;background:#f2efea;color:#1f1a14;text-decoration:none;font:800 20px/1 'Bricolage Grotesque',serif;letter-spacing:-.02em}
+.chip:hover{color:#1f1a14}
+.chip svg{color:var(--ac)}
+.over{position:absolute;left:28px;right:28px;bottom:28px;z-index:4;background:#1f1a14;color:#f2efea;border-radius:18px;padding:22px 24px;max-width:460px}
+.over b{display:block;font:700 22px/1.2 'Bricolage Grotesque',serif;margin-bottom:6px}
+.over p{margin:0;color:#d6cec4;line-height:1.55}
+.frame{position:absolute;z-index:3;border:2px solid #fff;border-radius:6px;transition:left var(--t-reveal) var(--ease),top var(--t-reveal) var(--ease),width var(--t-reveal) var(--ease),height var(--t-reveal) var(--ease),box-shadow var(--t-fast) var(--ease),border-color var(--t-fast);animation:pulse 2.4s ease-in-out infinite;overflow:visible}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 1px rgba(0,0,0,.25),0 0 10px rgba(255,255,255,.2)}50%{box-shadow:0 0 0 1px rgba(0,0,0,.25),0 0 30px rgba(255,255,255,.6)}}
+.frame i{position:absolute;width:20px;height:20px;border-color:#fff;border-style:solid;opacity:0;transition:opacity var(--t-fast) var(--ease)}
+.frame.tight i{opacity:1}
+.frame .c1{left:-9px;top:-9px;border-width:3px 0 0 3px}.frame .c2{right:-9px;top:-9px;border-width:3px 3px 0 0}
+.frame .c3{left:-9px;bottom:-9px;border-width:0 0 3px 3px}.frame .c4{right:-9px;bottom:-9px;border-width:0 3px 3px 0}
+.frame .lab{position:absolute;left:-2px;top:-36px;background:#fff;color:#1f1a14;padding:7px 10px;border-radius:5px;font-size:11px;white-space:nowrap;display:inline-flex;gap:8px;align-items:center}
+.frame .lab.ok{background:#e3f1e7;color:#1d4d30}
+.sweep{position:absolute;inset:0;overflow:hidden;border-radius:4px;opacity:0}
+.frame.tight .sweep{opacity:1}
+.sweep::after{content:"";position:absolute;left:0;right:0;height:40%;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.4));animation:sw 1.6s linear infinite}
+@keyframes sw{from{top:-40%}to{top:100%}}
+.frame.flash{border-color:#c9f2d6;animation:flash 700ms var(--ease)}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(201,242,214,.9),inset 0 0 0 999px rgba(255,255,255,.35)}100%{box-shadow:0 0 50px 6px rgba(201,242,214,.4),inset 0 0 0 999px rgba(255,255,255,0)}}
+.slot{display:none}
+
+.side{flex:1 1 420px;display:flex;align-items:center;justify-content:center;padding:56px 32px;border-left:1px solid var(--bd);background:var(--bg)}
+.form-wrap{width:100%;max-width:440px;display:grid;gap:26px}
+.eyebrow{color:var(--ac)}
+h1{font:800 48px/1 'Bricolage Grotesque',serif;letter-spacing:-.03em;margin:10px 0 10px}
+.wel{margin:0;color:var(--mu);font-size:17px;line-height:1.55}
+form{display:grid;gap:18px}
+label{font-weight:600;font-size:15px;display:block;margin-bottom:8px}
+.field{position:relative}
+.in{width:100%;height:54px;border-radius:12px;border:1.5px solid var(--bd);background:var(--sf);color:var(--tx);font:500 16px/1 'Figtree',sans-serif;padding:0 16px;transition:border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.in:focus{border-color:var(--ac);box-shadow:0 0 0 4px rgba(107,74,43,.16);outline:none}
+.in.pw{padding-right:84px}
+.eye{position:absolute;right:6px;top:5px;height:44px;min-width:70px;border:0;border-radius:9px;background:transparent;color:var(--ac);font:600 14px/1 'Figtree',sans-serif;cursor:pointer}
+.eye:hover{background:rgba(107,74,43,.08)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.keep{display:inline-flex;align-items:center;gap:10px;min-height:44px;font-weight:500;margin:0;cursor:pointer}
+.keep input{width:20px;height:20px;accent-color:var(--ac);margin:0}
+.forgot{font-weight:600;min-height:44px;display:inline-flex;align-items:center}
+.go{position:relative;overflow:hidden;height:54px;border-radius:12px;border:0;background:var(--ac);color:var(--ai);font:700 17px/1 'Figtree',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.go:hover{background:#56391f}
+.go:active{transform:scale(.98)}
+.go.ok{background:var(--ok)}
+.go .light{position:absolute;top:0;bottom:0;width:40%;left:-40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:light 1.3s var(--ease) infinite}
+@keyframes light{to{left:100%}}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{rotate:360deg}}
+.demo{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1.5px dashed var(--bd);border-radius:14px;padding:14px 16px;background:#faf8f5}
+.cred{font-size:15px;color:var(--mu);margin-top:6px}
+.cred code{font:500 14px/1 'IBM Plex Mono',monospace;color:var(--tx);background:#efe9e1;padding:3px 6px;border-radius:5px;margin-left:4px}
+.fill{min-height:44px;padding:0 16px;border-radius:10px;border:1.5px solid var(--ac);background:transparent;color:var(--ac);font:600 15px/1 'Figtree',sans-serif;cursor:pointer;flex:none}
+.fill:hover{background:rgba(107,74,43,.08)}
+.err{margin:0;color:#a3261b;font-weight:600;font-size:15px}
+.frame .lab.bad{background:#fde3df;color:#7a1d14}
+.req{margin:0;color:var(--mu);text-align:center}
+.inside{border-top:1px solid var(--bd);padding-top:22px}
+.inside ol{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px}
+.inside li{display:flex;gap:10px;align-items:baseline;color:var(--mu);font-size:15px}
+.inside li span{color:var(--ac);font-size:11px}
+.back{display:inline-flex;align-items:center;gap:8px;font-weight:600;min-height:44px;text-decoration:none}
+.wipe{position:fixed;inset:0;z-index:50;background:#f3eee8;translate:-101% 0;transition:translate var(--t-reveal) var(--ease);pointer-events:none}
+.wipe.on{translate:0 0;pointer-events:auto}
+.wipe{display:grid;place-items:center}
+.cont{font:600 17px/1 'Figtree',sans-serif;color:#9a4f3c;min-height:48px;display:inline-flex;align-items:center;padding:0 18px;border-radius:12px;opacity:0;transition:opacity var(--t-reveal) var(--ease) 900ms}
+.wipe.on .cont{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:1000px){
+  .pic{flex-basis:100%;min-height:340px;height:340px}
+  .over,.frame,.vig{display:none}
+  .side{border-left:0;border-top:1px solid var(--bd)}
+}
+@media (max-width:520px){
+  .pic{min-height:240px;height:240px}
+  .side{padding:40px 20px}
+  h1{font-size:40px}
+  .inside ol{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  .lg *,.lg *::before,.lg *::after{animation:none !important;transition:none !important}
+}
+</style>
+</helmet>
+<div class="lg">
+  <div class="pic" role="img" aria-label="An open book on a sunlit windowsill">
+    <img src="./assets/26c55d1c6786d4c2165cf99634d79af4.jpg" alt="" style="object-position: center bottom">
+    <div class="vig {{vigCls}}"></div>
+    <div class="frame {{frameCls}}" style="left: {{fr.l}}%; top: {{fr.t}}%; width: {{fr.w}}%; height: {{fr.h}}%">
+      <div class="sweep"></div>
+      <i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i>
+      <span class="lab mono {{labCls}}" aria-live="polite">{{label}}</span>
+    </div>
+    <a class="chip" href="Main.dc.html" aria-label="Quillo home">
+      <svg width="26" height="26" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="13.5" r="9.5"></circle><path d="M20.5 20.5l6 6"></path><path d="M9 16c1.5-4.5 5-7 9-7.5"></path></svg>
+      Quillo
+    </a>
+    <span class="slot mono">Photo · login.jpg</span>
+    <div class="over"><b>Quillo</b><p>A patient AI tutor that explains, quizzes and remembers how you learn.</p></div>
+  </div>
+
+  <main class="side">
+    <div class="form-wrap">
+      <div>
+        <span class="mono eyebrow">Study dashboard</span>
+        <h1>Log in</h1>
+        <p class="wel">Welcome back. Your classrooms, tutors and streak are right where you left them.</p>
+      </div>
+      <div class="demo">
+        <div><span class="mono" style="color:var(--ac)">Demo account</span>
+          <div class="cred">Email <code>cognitivecrew@gmail.com</code></div>
+          <div class="cred">Password <code>password@123</code></div></div>
+        <button class="fill" type="button" onClick="{{useDemo}}">Fill in</button>
+      </div>
+      <form onSubmit="{{submit}}" novalidate="novalidate">
+        <div>
+          <label for="em">Email</label>
+          <input id="em" class="in" type="email" autocomplete="email" placeholder="cognitivecrew@gmail.com" value="{{email}}" onChange="{{onEmail}}" onFocus="{{focusEmail}}" onBlur="{{blur}}">
+        </div>
+        <div>
+          <label for="pw">Password</label>
+          <div class="field">
+            <input id="pw" class="in pw" type="{{pwType}}" autocomplete="current-password" value="{{pass}}" onChange="{{onPass}}" onFocus="{{focusPass}}" onBlur="{{blur}}">
+            <button class="eye" type="button" aria-label="{{eyeLabel}}" onClick="{{toggleShow}}">{{eyeText}}</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="keep"><input type="checkbox" checked="{{keep}}" onChange="{{toggleKeep}}">Keep me signed in</label>
+          <a class="forgot" href="#forgot">Forgot password?</a>
+        </div>
+        <button class="go {{goCls}}" type="submit" disabled="{{busy}}">
+          <sc-if value="{{isIdle}}" hint-placeholder-val="{{ true }}">Log in</sc-if>
+          <sc-if value="{{isAuth}}" hint-placeholder-val="{{ false }}"><span class="light"></span><span class="spin" aria-hidden="true"></span>Authorizing…</sc-if>
+          <sc-if value="{{isOk}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Access granted</sc-if>
+        </button>
+        <sc-if value="{{err}}" hint-placeholder-val="{{ false }}"><p class="err" role="alert">{{err}}</p></sc-if>
+        <span class="sr" aria-live="polite">{{status}}</span>
+        <p class="req">No account yet? <a href="#request">Request access</a></p>
+      </form>
+      <div class="inside">
+        <span class="mono" style="color:var(--mu)">Inside the dashboard</span>
+        <ol>
+          <li><span class="mono">01</span>Pick up where you left off</li>
+          <li><span class="mono">02</span>Ask your tutors anything</li>
+          <li><span class="mono">03</span>Test what you know</li>
+          <li><span class="mono">04</span>Track your study streak</li>
+        </ol>
+      </div>
+      <a class="back" href="Main.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back to home</a>
+      <a id="go-dash" class="sr" href="Dashboard.dc.html" tabindex="-1" aria-hidden="true">Open dashboard</a>
+    </div>
+  </main>
+  <div class="wipe {{wipeCls}}"><a class="cont" href="Dashboard.dc.html">Open your dashboard →</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+var FR = {
+  idle: { l: 38, t: 62, w: 58, h: 34 },
+  email: { l: 42, t: 68, w: 52, h: 27 },
+  pass: { l: 46, t: 72, w: 44, h: 21 }
+};
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { focus: 'none', email: '', pass: '', show: false, keep: true, stage: 'idle' };
+  }
+  componentDidMount() {
+    try { this.reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { this.reduce = false; }
+  }
+  componentWillUnmount() { (this.timers || []).forEach(clearTimeout); }
+  later(fn, ms) { this.timers = this.timers || []; this.timers.push(setTimeout(fn, ms)); }
+  openDash() {
+    var a = document.getElementById('go-dash');
+    if (a) a.click();
+  }
+  renderVals() {
+    var self = this, s = this.state;
+    var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email);
+    var key = s.stage !== 'idle' ? 'pass' : (s.focus === 'email' ? 'email' : (s.focus === 'pass' ? 'pass' : 'idle'));
+    var label = 'Desk 01 · Ready';
+    if (s.focus === 'email') label = valid ? 'ID matched' : 'Identifying…';
+    if (s.focus === 'pass') label = 'Verifying…';
+    if (s.err && s.focus === 'none') label = 'Not recognised';
+    if (s.stage === 'auth') label = 'Authorizing…';
+    if (s.stage === 'ok' || s.stage === 'wipe') label = 'Access granted';
+    var tight = key !== 'idle';
+    return {
+      fr: FR[key],
+      frameCls: (tight ? 'tight' : '') + (s.stage === 'ok' ? ' flash' : ''),
+      vigCls: tight ? 'on' : '',
+      label: label,
+      labCls: (s.focus === 'email' && valid) || s.stage === 'ok' || s.stage === 'wipe' ? 'ok' : (s.err && s.focus === 'none' ? 'bad' : ''),
+      email: s.email, pass: s.pass,
+      err: s.err || '',
+      useDemo: function () { self.setState({ email: 'cognitivecrew@gmail.com', pass: 'password@123', err: '' }); },
+      pwType: s.show ? 'text' : 'password',
+      eyeText: s.show ? 'Hide' : 'Show',
+      eyeLabel: s.show ? 'Hide password' : 'Show password',
+      keep: s.keep,
+      onEmail: function (e) { self.setState({ email: e.target.value, err: '' }); },
+      onPass: function (e) { self.setState({ pass: e.target.value, err: '' }); },
+      focusEmail: function () { self.setState({ focus: 'email' }); },
+      focusPass: function () { self.setState({ focus: 'pass' }); },
+      blur: function () { self.setState({ focus: 'none' }); },
+      toggleShow: function () { self.setState({ show: !self.state.show }); },
+      toggleKeep: function () { self.setState({ keep: !self.state.keep }); },
+      busy: s.stage !== 'idle',
+      isIdle: s.stage === 'idle', isAuth: s.stage === 'auth', isOk: s.stage === 'ok' || s.stage === 'wipe',
+      goCls: s.stage === 'ok' || s.stage === 'wipe' ? 'ok' : '',
+      wipeCls: s.stage === 'wipe' ? 'on' : '',
+      status: s.stage === 'auth' ? 'Authorizing' : (s.stage === 'ok' ? 'Access granted' : ''),
+      submit: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (self.state.stage !== 'idle') return;
+        var okCreds = self.state.email.trim().toLowerCase() === 'cognitivecrew@gmail.com' && self.state.pass === 'password@123';
+        if (!okCreds) { self.setState({ err: 'That email and password don’t match the demo account. Use the details above.' }); return; }
+        if (self.reduce) { self.openDash(); return; }
+        self.setState({ stage: 'auth' });
+        self.later(function () { self.setState({ stage: 'ok' }); }, 1300);
+        self.later(function () { self.setState({ stage: 'wipe' }); }, 2100);
+        self.later(function () { self.openDash(); }, 2750);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

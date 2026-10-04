@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home · Quillo</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f3eee8}
+a{color:#9a4f3c}a:hover{color:#7d3d2d}
+.db{--ease:cubic-bezier(.2,.7,.2,1);--t-fast:200ms;--t-reveal:600ms;
+  --bg:#f3eee8;--card:#fffdfa;--bd:#e7ded3;--tx:#1f1a14;--mu:#62584d;--ac:#9a4f3c;--ac-d:#7d3d2d;--soft:#f8f3ee;
+  --disp:'Bricolage Grotesque',Georgia,serif;--body:'Figtree',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;
+  font-family:var(--body);color:var(--tx);background:var(--bg);min-height:100vh;padding:18px;
+  display:grid;grid-template-columns:248px minmax(0,1fr) 340px;gap:18px;align-items:start;overflow-x:clip}
+.db *{box-sizing:border-box}
+.db ::selection{background:#f3cfae;color:#3a1a0c}
+.db :focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+.db :focus:not(:focus-visible){outline:none}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.11em;font-size:12px;font-weight:500}
+button,select{font-family:inherit}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px}
+.h2{font:700 21px/1.2 var(--disp);letter-spacing:-.01em;margin:0}
+.ibtn{width:44px;height:44px;border-radius:10px;border:0;background:transparent;color:var(--mu);display:grid;place-items:center;cursor:pointer;flex:none}
+.ibtn:hover{background:rgba(31,26,20,.06);color:var(--tx)}
+.ibtn[aria-disabled="true"]{opacity:.35;cursor:default}
+@keyframes rise{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+
+/* SIDEBAR */
+.sb{align-self:stretch;display:flex;flex-direction:column;padding:6px 2px;min-width:0}
+.logo{display:inline-flex;align-items:center;gap:10px;font:800 26px/1 var(--disp);letter-spacing:-.02em;color:var(--tx);text-decoration:none;padding:12px 12px 26px;min-height:44px}
+.logo:hover{color:var(--tx)}
+.logo svg{color:var(--ac)}
+.nl{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.ni{width:100%;display:flex;align-items:center;gap:12px;min-height:46px;padding:0 12px;border-radius:12px;border:0;background:transparent;color:#2c251e;font-size:16.5px;font-weight:500;cursor:pointer;text-align:left;transition:background var(--t-fast) var(--ease)}
+.ni:hover{background:rgba(255,253,250,.8)}
+.ni[aria-current="page"]{background:var(--card);box-shadow:0 1px 2px rgba(31,26,20,.07);font-weight:700}
+.ni .ct{margin-left:auto;font:600 12px/1 var(--mono);background:var(--ac);color:#fff;border-radius:999px;padding:4px 8px}
+.sec-l{padding:26px 12px 10px;margin:0;color:var(--mu)}
+.dotc{width:10px;height:10px;border-radius:50%;flex:none}
+.me{margin-top:auto;display:flex;align-items:center;gap:12px;padding:16px 6px 4px}
+.me b{display:block;font-size:15.5px}
+.me small{display:block;color:var(--mu);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* MAIN */
+.mc{min-width:0;display:grid;gap:18px}
+.band{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);overflow:hidden;min-height:210px;padding:0}
+.band-copy{padding:30px 32px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.band h1{font:800 clamp(30px,3vw,40px)/1.05 var(--disp);letter-spacing:-.025em;margin:0}
+.band .date{color:var(--mu)}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 12px;background:var(--soft);border:1px solid var(--bd);font-size:14.5px;font-weight:600}
+.pill.hot{background:#fbe6d6;border-color:#f0c6a5;color:#7a3416}
+.band-ph{position:relative;min-height:210px}
+.band-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 45%}
+
+/* TODAY */
+.today{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:0;padding:0;overflow:hidden}
+.up{padding:26px 28px;display:grid;gap:14px;align-content:start}
+.up-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cls{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;border-radius:8px;padding:5px 9px}
+.up h2{font:700 28px/1.1 var(--disp);letter-spacing:-.02em;margin:0}
+.count{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
+.count b{font:700 34px/1 var(--disp);letter-spacing:-.02em}
+.count span{color:var(--mu)}
+.pb{height:8px;border-radius:8px;background:#efe7de;overflow:hidden}
+.pb i{display:block;height:100%;border-radius:8px}
+.resume{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:14px;background:var(--ac);color:#fff;font:700 17px/1 var(--body);text-decoration:none;justify-self:start;transition:background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.resume:hover{background:var(--ac-d);color:#fff;transform:translateY(-1px)}
+.then{background:var(--soft);border-left:1px solid var(--bd);padding:22px 22px;display:grid;gap:10px;align-content:start}
+.then-i{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--bd)}
+.then-i:last-child{border-bottom:0}
+.then-i b{font-size:15.5px;font-weight:600}
+.then-i small{grid-column:2;color:var(--mu);font-size:14px}
+
+/* ASK */
+.ask-card{padding:24px 26px}
+.ask-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.who-sel{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:15px}
+.who-sel select{min-height:40px;border-radius:10px;border:1px solid var(--bd);background:var(--card);padding:0 10px;font-size:15px;color:var(--tx)}
+.ask{border:1.5px solid var(--bd);border-radius:16px;background:#fff;padding:16px 16px 10px;transition:border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.ask:focus-within{border-color:var(--ac);box-shadow:0 0 0 4px rgba(154,79,60,.14)}
+.ask textarea{border:0;resize:none;font:400 19px/1.5 var(--body);color:var(--tx);min-height:96px;width:100%;background:transparent}
+.ask textarea::placeholder{color:#857a6e}
+.ask textarea:focus{outline:none}
+.ask-bar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.send{min-height:44px;padding:0 18px;border-radius:12px;border:0;background:var(--ac);color:#fff;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.send:hover{background:var(--ac-d)}
+.send[disabled]{background:#d8cbbd;cursor:default}
+.sugg{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:15.5px;font-weight:500;cursor:pointer;transition:border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.chip:hover{border-color:#d3b9a6;background:#fff8f2}
+.chip svg{color:var(--ac)}
+.convo{margin-top:16px;display:grid;gap:10px;animation:rise var(--t-reveal) var(--ease) both}
+.msg{max-width:88%;padding:12px 16px;border-radius:16px;line-height:1.55}
+.msg.me2{justify-self:end;background:#2c251e;color:#f8f3ee;border-bottom-right-radius:4px}
+.msg.tu{background:var(--soft);border:1px solid var(--bd);border-bottom-left-radius:4px}
+.msg.tu b{display:block;font-size:13px;color:var(--ac);margin-bottom:4px}
+.dots3{display:inline-flex;gap:4px;padding:6px 0}.dots3 i{width:7px;height:7px;border-radius:50%;background:var(--ac);animation:bob 1s ease-in-out infinite}
+.dots3 i:nth-child(2){animation-delay:.15s}.dots3 i:nth-child(3){animation-delay:.3s}
+@keyframes bob{50%{translate:0 -4px;opacity:.5}}
+
+/* SECTIONS */
+.sh{display:flex;align-items:center;justify-content:space-between;margin:8px 0 12px}
+.arrows{display:flex;gap:2px}
+.cl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cc{display:grid;gap:8px;text-decoration:none;color:inherit;padding:14px;border-radius:18px;background:var(--card);border:1px solid var(--bd);animation:rise var(--t-reveal) var(--ease) both;animation-delay:calc(var(--i) * 70ms);transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.cc:hover{color:inherit;transform:translateY(-3px);box-shadow:0 16px 30px -22px rgba(31,26,20,.5)}
+.tile{position:relative;height:138px;border-radius:12px;display:grid;place-items:center;margin-bottom:4px}
+.due{position:absolute;left:8px;top:8px;background:#fff;border-radius:8px;padding:6px 9px;font-size:13.5px;font-weight:600}
+.avs{position:absolute;right:8px;top:8px;display:flex}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;border:2px solid #fff;margin-left:-8px;flex:none}
+.cc h3{margin:0;font:700 17px/1.25 var(--disp)}
+.meta{display:flex;justify-content:space-between;font-size:14.5px;font-weight:600}
+.meta span{color:var(--mu);font-weight:400}
+.tg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tc{display:flex;gap:16px;padding:16px;text-decoration:none;color:inherit;border-radius:18px;background:var(--card);border:1px solid var(--bd);transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.tc:hover{color:inherit;transform:translateY(-3px);box-shadow:0 16px 30px -22px rgba(31,26,20,.5)}
+.thumb{width:96px;height:112px;border-radius:12px;overflow:hidden;flex:none;position:relative;background:#333}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tc h3{margin:2px 0 8px;font:700 18px/1.2 var(--disp)}
+.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:8px;padding:4px 8px;font-size:13.5px}
+.ago{color:var(--mu);font-size:13.5px}
+.tc p{margin:10px 0 0;color:#40382f;font-size:15px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* HEATMAP */
+.hm-card{padding:24px 26px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 20px}
+.stat{background:var(--soft);border:1px solid var(--bd);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font:800 30px/1 var(--disp);letter-spacing:-.02em;margin-top:6px}
+.stat span{color:var(--mu)}
+.hm-scroll{overflow-x:auto;padding-bottom:6px}
+.hm-in{min-width:640px}
+.months{display:grid;grid-template-columns:repeat(52,minmax(0,1fr));gap:3px;font-size:12.5px;color:var(--mu);margin-bottom:6px;height:16px}
+.months span{white-space:nowrap}
+.hm{display:grid;grid-template-rows:repeat(7,auto);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:3px}
+.cell{aspect-ratio:1;border-radius:3px;border:0;padding:0;cursor:pointer;min-width:0;transition:transform var(--t-fast) var(--ease)}
+.cell:hover,.cell[aria-pressed="true"]{transform:scale(1.35);box-shadow:0 0 0 2px #1f1a14}
+.l0{background:#ece3d9}.l1{background:#f3cfae}.l2{background:#e49a63}.l3{background:#c0632c}.l4{background:#84391a}
+.hm-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.legend{display:flex;align-items:center;gap:6px;color:var(--mu);font-size:14px}
+.legend i{width:14px;height:14px;border-radius:3px}
+.tip{color:var(--tx);font-size:14.5px;font-weight:600;min-height:20px}
+
+/* RIGHT PANEL */
+.rp{min-width:0;display:grid;gap:18px}
+.prof{padding:22px}
+.who{display:flex;align-items:center;gap:14px}
+.who b{display:block;font:700 20px/1.2 var(--disp)}
+.who .mono{color:var(--mu)}
+.more{margin-top:14px;width:100%;min-height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--soft);color:var(--tx);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;cursor:pointer}
+.more svg{transition:rotate var(--t-fast) var(--ease)}
+.more[aria-expanded="true"] svg{rotate:180deg}
+.prof-body{display:grid;gap:18px;margin-top:18px;animation:rise var(--t-reveal) var(--ease) both}
+.lab{margin:0 0 10px;color:var(--mu)}
+.gp{margin:0;font-size:16px;line-height:1.55}
+.lr{display:grid;grid-template-columns:minmax(0,1fr) 42%;gap:10px;align-items:center;font-size:15px;margin-bottom:8px}
+.lr .t{height:8px;border-radius:8px;background:#efe7de;overflow:hidden}
+.lr .t i{display:block;height:100%;border-radius:8px}
+.vals{display:flex;flex-wrap:wrap;gap:8px}
+.val{background:var(--soft);border:1px solid var(--bd);border-radius:10px;padding:7px 10px;font-size:14.5px;font-weight:500}
+.side-card{padding:20px 22px}
+.side-card .h2{font-size:18px;margin-bottom:6px}
+.dl{list-style:none;margin:0;padding:0}
+.dl li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--bd)}
+.dl li:last-child{border-bottom:0}
+.dday{border-radius:12px;text-align:center;padding:7px 0;line-height:1}
+.dday b{display:block;font:800 20px/1 var(--disp)}
+.dday span{font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.dl b.t{display:block;font-size:15px;font-weight:600}
+.dl small{color:var(--mu);font-size:13.5px}
+.ch{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start;padding:12px 0;border-bottom:1px dashed var(--bd);text-decoration:none;color:inherit}
+.ch:last-child{border-bottom:0}
+.ch:hover{color:inherit}
+.ch:hover .q{color:var(--ac)}
+.ch .ico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff}
+.ch .q{display:block;font-size:15px;font-weight:600;line-height:1.35;transition:color var(--t-fast)}
+.ch small{color:var(--mu);font-size:13.5px}
+.lb{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px}
+.lb li{display:grid;grid-template-columns:24px 28px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14.5px}
+.lb .rk{color:var(--mu);font-size:12px}
+.lb .bar{height:6px;border-radius:6px;background:#efe7de;overflow:hidden;margin-top:4px}
+.lb .bar i{display:block;height:100%;background:#d4a27f}
+.lb li.you{font-weight:700}
+.lb li.you .bar i{background:var(--ac)}
+
+@media (max-width:1320px){
+  .db{grid-template-columns:232px minmax(0,1fr)}
+  .rp{grid-column:2;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:1060px){
+  .cl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .today{grid-template-columns:minmax(0,1fr)}
+  .then{border-left:0;border-top:1px solid var(--bd)}
+}
+@media (max-width:860px){
+  .db{grid-template-columns:minmax(0,1fr);padding:12px}
+  .rp{grid-column:auto;grid-template-columns:minmax(0,1fr)}
+  .band{grid-template-columns:minmax(0,1fr)}
+  .band-ph{min-height:160px;order:-1}
+  .tg{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .cl{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .band-copy,.up,.ask-card,.hm-card{padding:20px 18px}
+  .tc{flex-direction:column}.thumb{width:100%;height:140px}
+}
+@media (prefers-reduced-motion:reduce){
+  .db *,.db *::before,.db *::after{animation:none !important;transition:none !important}
+}
+</style>
+</helmet>
+<div class="db">
+
+<!-- SIDEBAR -->
+<aside class="sb" aria-label="Sidebar">
+  <a class="logo" href="Main.dc.html" aria-label="Quillo home">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="13.5" r="9.5"></circle><path d="M20.5 20.5l6 6"></path><path d="M9 16c1.5-4.5 5-7 9-7.5"></path></svg>
+    Quillo
+  </a>
+  <nav aria-label="Main">
+    <ul class="nl">
+      <li><button class="ni" type="button" aria-current="{{navHome}}" onClick="{{goHome}}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20h-5.5v-6h-5v6H4z"></path></svg>Home</button></li>
+      <li><button class="ni" type="button" aria-current="{{navClass}}" onClick="{{goClass}}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"></rect><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"></rect><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"></rect><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"></rect></svg>Classrooms</button></li>
+      <li><button class="ni" type="button" aria-current="{{navDue}}" onClick="{{goDue}}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>Due Soon<span class="ct">{{dueCount}}</span></button></li>
+    </ul>
+  </nav>
+  <p class="sec-l mono">Classrooms</p>
+  <ul class="nl">
+    <sc-for list="{{classes}}" as="c" hint-placeholder-count="3">
+      <li><button class="ni" type="button"><span class="dotc" style="background: {{c.c}}"></span>{{c.name}}</button></li>
+    </sc-for>
+  </ul>
+  <div class="me">
+    <svg width="44" height="44" viewBox="0 0 46 46" aria-hidden="true"><rect width="46" height="46" rx="12" fill="#9a4f3c"></rect><path d="M10 30c6-12 18-16 26-14-4 6-12 14-26 14z" fill="#f8e3d5"></path></svg>
+    <div style="min-width:0;flex:1"><b>CognitiveCrew</b><small>cognitivecrew@gmail.com</small></div>
+    <a class="ibtn" href="Main.dc.html" aria-label="Log out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"></path></svg></a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="mc" id="main">
+
+  <!-- greeting band with photo -->
+  <section class="card band" aria-labelledby="hi">
+    <div class="band-copy">
+      <span class="mono date">{{dateLabel}}</span>
+      <h1 id="hi">{{greeting}}</h1>
+      <div class="chips-row">
+        <span class="pill hot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5.5 1-8.5z"></path></svg>{{streak}}-day streak</span>
+        <span class="pill">{{dueCount}} things due this week</span>
+      </div>
+    </div>
+    <div class="band-ph"><img src="./assets/bbee8eb5076cbc88531194c627249c40.jpg" alt="A student writing at a desk in front of a whiteboard"></div>
+  </section>
+
+  <!-- 1. TODAY strip -->
+  <section class="card today" aria-labelledby="up-next">
+    <div class="up">
+      <div class="up-top">
+        <span class="mono" style="color:var(--ac)">Up next</span>
+        <span class="cls" style="background: {{next.tint}}; color: {{next.c}}"><span class="dotc" style="background: {{next.c}}"></span>{{next.cls}}</span>
+      </div>
+      <h2 id="up-next">{{next.title}}</h2>
+      <div class="count" aria-live="polite"><b>{{countdown}}</b><span>until it's due · {{next.dueLabel}}</span></div>
+      <div>
+        <div class="pb"><i style="width: {{next.pct}}%; background: {{next.c}}"></i></div>
+        <div class="meta" style="margin-top:8px">{{next.pct}}% complete<span>about {{next.time}} left</span></div>
+      </div>
+      <a class="resume" href="#lesson">Resume lesson
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+    <div class="then">
+      <span class="mono" style="color:var(--mu)">Then today</span>
+      <sc-for list="{{thenList}}" as="t" hint-placeholder-count="3">
+        <div class="then-i"><span class="dotc" style="background: {{t.c}}"></span><b>{{t.title}}</b><small>{{t.sub}}</small></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- 4. ASK, the centre -->
+  <section class="card ask-card" aria-labelledby="ask-h">
+    <div class="ask-head">
+      <h2 id="ask-h" class="h2">Ask your tutor</h2>
+      <label class="who-sel" for="tutor">Asking
+        <select id="tutor" value="{{tutor}}" onChange="{{onTutor}}">
+          <sc-for list="{{tutorOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}">{{o.v}}</option></sc-for>
+        </select>
+      </label>
+    </div>
+    <form class="ask" onSubmit="{{send}}">
+      <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your question</label>
+      <textarea id="q" rows="3" placeholder="Ask anything about {{next.title}}, or something new…" value="{{q}}" onChange="{{onQ}}"></textarea>
+      <div class="ask-bar">
+        <div style="display:flex;gap:2px">
+          <button class="ibtn" type="button" aria-label="Upload an image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="15" rx="2.5"></rect><circle cx="9" cy="9.5" r="1.6"></circle><path d="M20.5 15l-4.5-4.5L7 19.5"></path></svg></button>
+          <button class="ibtn" type="button" aria-label="Ask with your voice"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></button>
+        </div>
+        <button class="send" type="submit" disabled="{{noQ}}">Ask<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+      </div>
+    </form>
+    <div class="sugg" role="list" aria-label="Suggestions for your current lesson">
+      <sc-for list="{{sugg}}" as="s" hint-placeholder-count="4">
+        <button class="chip" type="button" role="listitem" onClick="{{s.pick}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>{{s.label}}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{hasReply}}" hint-placeholder-val="{{ false }}">
+      <div class="convo" aria-live="polite">
+        <div class="msg me2">{{asked}}</div>
+        <div class="msg tu"><b>{{repTutor}}</b>
+          <sc-if value="{{thinking}}" hint-placeholder-val="{{ false }}"><span class="dots3" aria-label="Thinking"><i></i><i></i><i></i></span></sc-if>
+          <sc-if value="{{answered}}" hint-placeholder-val="{{ false }}"><span>Demo preview: in the full app I'd answer here, starting with a diagram because that's how you like to learn, then check your understanding with a quick question.</span></sc-if>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- continue learning -->
+  <section aria-labelledby="cl-h">
+    <div class="sh"><h2 id="cl-h" class="h2">Continue learning</h2>
+      <div class="arrows">
+        <button class="ibtn" type="button" aria-label="Previous lessons" aria-disabled="{{clPrevOff}}" onClick="{{clPrev}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg></button>
+        <button class="ibtn" type="button" aria-label="Next lessons" aria-disabled="{{clNextOff}}" onClick="{{clNext}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+      </div>
+    </div>
+    <div class="cl">
+      <sc-for list="{{lessons}}" as="l" hint-placeholder-count="3">
+        <a class="cc" href="#lesson" style="--i: {{$index}}">
+          <div class="tile" style="background: {{l.tint}}">
+            <sc-if value="{{l.due}}" hint-placeholder-val="{{ true }}"><span class="due">{{l.due}}</span></sc-if>
+            <sc-if value="{{l.group}}" hint-placeholder-val="{{ false }}"><span class="avs"><span class="av" style="background:#2f5f78">E</span><span class="av" style="background:#c0632c">A</span></span></sc-if>
+            <sc-if value="{{l.magnet}}" hint-placeholder-val="{{ false }}"><svg width="58" height="58" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 30a18 18 0 0 0 36 0V14H40v16a8 8 0 0 1-16 0V14H14z" fill="#d63a2f"></path><rect x="14" y="10" width="10" height="9" fill="#d9dde6"></rect><rect x="40" y="10" width="10" height="9" fill="#d9dde6"></rect></svg></sc-if>
+            <sc-if value="{{l.square}}" hint-placeholder-val="{{ false }}"><svg width="58" height="58" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 54V10l42 44z" fill="#6f8a9a"></path><path d="M22 44V34l10 10z" fill="#e3edf2"></path></svg></sc-if>
+            <sc-if value="{{l.bulb}}" hint-placeholder-val="{{ false }}"><svg width="58" height="58" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="26" r="14" fill="#e9a23b"></circle><rect x="25" y="40" width="14" height="10" rx="3" fill="#8a7d70"></rect></svg></sc-if>
+            <sc-if value="{{l.beam}}" hint-placeholder-val="{{ false }}"><svg width="58" height="58" viewBox="0 0 64 64" fill="none" stroke="#2f6b45" stroke-width="5" stroke-linecap="round" aria-hidden="true"><path d="M8 26h48M8 36h48M14 36l8-10 8 10 8-10 8 10 8-10M14 36v16M50 36v16"></path></svg></sc-if>
+            <sc-if value="{{l.talk}}" hint-placeholder-val="{{ false }}"><svg width="58" height="58" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 14h32a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H24l-10 8v-8h-4a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" fill="#c0632c"></path><path d="M50 26h4a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6h-2v6l-8-6H32" fill="none" stroke="#9a4f3c" stroke-width="4"></path></svg></sc-if>
+          </div>
+          <span class="cls" style="background: {{l.tint}}; color: {{l.c}}; justify-self:start"><span class="dotc" style="background: {{l.c}}"></span>{{l.cls}}</span>
+          <h3>{{l.title}}</h3>
+          <div class="pb" style="height:6px"><i style="width: {{l.pct}}%; background: {{l.c}}"></i></div>
+          <div class="meta">{{l.pct}}% complete<span>{{l.time}}</span></div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- tutors -->
+  <section aria-labelledby="tu-h">
+    <div class="sh"><h2 id="tu-h" class="h2">Tutors</h2>
+      <div class="arrows">
+        <button class="ibtn" type="button" aria-label="Previous tutors" aria-disabled="{{tuPrevOff}}" onClick="{{tuPrev}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg></button>
+        <button class="ibtn" type="button" aria-label="Next tutors" aria-disabled="{{tuNextOff}}" onClick="{{tuNext}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+      </div>
+    </div>
+    <div class="tg">
+      <sc-for list="{{tutors}}" as="t" hint-placeholder-count="2">
+        <a class="tc" href="#tutor">
+          <div class="thumb"><img src="{{t.img}}" alt=""></div>
+          <div style="min-width:0">
+            <h3>{{t.name}}</h3>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="tag">{{t.course}}</span><span class="ago">· {{t.ago}}</span></div>
+            <p>{{t.desc}}</p>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- 2. full-year heatmap -->
+  <section class="card hm-card" aria-labelledby="hm-h">
+    <h2 id="hm-h" class="h2">Learning sessions</h2>
+    <div class="stats">
+      <div class="stat"><span class="mono">Current streak</span><b>{{streak}} days</b></div>
+      <div class="stat"><span class="mono">Best streak</span><b>{{best}} days</b></div>
+      <div class="stat"><span class="mono">Past 12 months</span><b>{{total}}</b></div>
+    </div>
+    <div class="hm-scroll">
+      <div class="hm-in">
+        <div class="months" aria-hidden="true">
+          <sc-for list="{{months}}" as="m" hint-placeholder-count="12"><span style="grid-column: {{m.col}} / span 3">{{m.name}}</span></sc-for>
+        </div>
+        <div class="hm" role="group" aria-label="Study sessions per day for the past year">
+          <sc-for list="{{cells}}" as="c" hint-placeholder-count="364">
+            <button class="cell {{c.cls}}" type="button" aria-label="{{c.label}}" aria-pressed="{{c.sel}}" onClick="{{c.pick}}" onMouseEnter="{{c.pick}}"></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div class="hm-foot">
+      <span class="tip" aria-live="polite">{{tip}}</span>
+      <span class="legend">Less <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> More</span>
+    </div>
+  </section>
+</main>
+
+<!-- 3. RIGHT PANEL: compact profile + live info -->
+<aside class="rp" aria-label="Your week">
+  <section class="card prof" aria-label="Your profile">
+    <div class="who">
+      <svg width="56" height="56" viewBox="0 0 68 68" aria-hidden="true"><circle cx="34" cy="34" r="34" fill="#9a4f3c"></circle><path d="M14 44c9-18 27-24 40-21-6 9-19 21-40 21z" fill="#f8e3d5"></path></svg>
+      <div style="min-width:0"><b>CognitiveCrew</b><span class="mono">Problem solver</span></div>
+    </div>
+    <button class="more" type="button" aria-expanded="{{profOpen}}" aria-controls="prof-body" onClick="{{toggleProf}}">{{profText}}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+    <sc-if value="{{prof}}" hint-placeholder-val="{{ false }}">
+      <div class="prof-body" id="prof-body">
+        <div><p class="lab mono">Game plan</p><p class="gp">I'm aiming to <b>do well academically</b> by <b>mastering the basics</b>.</p></div>
+        <div><p class="lab mono">How I like to learn</p>
+          <sc-for list="{{styles}}" as="s" hint-placeholder-count="3">
+            <div class="lr"><span>{{s.name}}</span><span class="t" role="meter" aria-label="{{s.name}}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{s.v}}"><i style="width: {{s.v}}%; background: {{s.c}}"></i></span></div>
+          </sc-for>
+        </div>
+        <div><p class="lab mono">Values</p><div class="vals"><span class="val">Growth</span><span class="val">Creativity</span><span class="val">Courage</span><span class="val">Learning</span><span class="val">Excellence</span></div></div>
+      </div>
+    </sc-if>
+  </section>
+
+  <section class="card side-card" aria-labelledby="dl-h">
+    <h2 id="dl-h" class="h2">Upcoming deadlines</h2>
+    <ul class="dl">
+      <sc-for list="{{deadlines}}" as="d" hint-placeholder-count="4">
+        <li><span class="dday" style="background: {{d.tint}}; color: {{d.c}}"><b>{{d.day}}</b><span>{{d.mon}}</span></span><div><b class="t">{{d.title}}</b><small>{{d.sub}}</small></div></li>
+      </sc-for>
+    </ul>
+  </section>
+
+  <section class="card side-card" aria-labelledby="chat-h">
+    <h2 id="chat-h" class="h2">Recent tutor chats</h2>
+    <sc-for list="{{chats}}" as="c" hint-placeholder-count="3">
+      <a class="ch" href="#chat"><span class="ico" style="background: {{c.c}}">{{c.init}}</span><div><span class="q">{{c.q}}</span><small>{{c.who}} · {{c.when}}</small></div></a>
+    </sc-for>
+  </section>
+
+  <section class="card side-card" aria-labelledby="lb-h">
+    <h2 id="lb-h" class="h2">Leaderboard</h2>
+    <small style="color:var(--mu)">Time spent learning this week</small>
+    <ol class="lb">
+      <sc-for list="{{board}}" as="b" hint-placeholder-count="4">
+        <li class="{{b.cls}}"><span class="rk mono">{{b.rank}}</span><span class="av" style="background: {{b.color}}; margin:0">{{b.init}}</span><div style="min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{b.name}}</div><div class="bar"><i style="width: {{b.w}}%"></i></div></div><span class="mono" style="font-size:12px;color:var(--mu)">{{b.time}}</span></li>
+      </sc-for>
+    </ol>
+  </section>
+</aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2100}}'>
+var CLASSES = {
+  phys: { name: 'Applied Physics 101', c: '#2f5f78', tint: '#e3edf2' },
+  start: { name: 'Startup Strategy', c: '#9a4f3c', tint: '#f6e6df' },
+  struct: { name: 'Structural Engineering', c: '#2f6b45', tint: '#e2efe6' }
+};
+var DAY = 86400000;
+var LESSONS = [
+  { title: 'Electricity & Magnetism', k: 'phys', pct: 86, time: '30 min', icon: 'magnet', dueIn: 1 },
+  { title: 'Forces & Motion Essentials', k: 'phys', pct: 57, time: '45 min', icon: 'square', dueIn: 9, group: true },
+  { title: 'Pricing Your First Product', k: 'start', pct: 42, time: '2 hrs', icon: 'bulb' },
+  { title: 'Load Paths in Beams', k: 'struct', pct: 18, time: '1 hr', icon: 'beam', dueIn: 10 },
+  { title: 'Running Customer Interviews', k: 'start', pct: 9, time: '1.5 hrs', icon: 'talk' }
+];
+var EXTRA_DUE = [
+  { title: 'Lab report: magnetic fields', k: 'phys', dueIn: 2, sub: 'Upload as PDF' },
+  { title: 'Pitch deck draft', k: 'start', dueIn: 4, sub: 'Group of 3' }
+];
+var TUTORS = [
+  { name: 'Physics Mentor', course: 'Physics 101', ago: '2 weeks ago', img: './assets/1c207780c05dacf92bf0678a5bd93ca7.jpg', desc: 'Make physics clear! Learn how equations connect to your everyday world.', c: '#2f5f78' },
+  { name: 'Coding Tutor', course: 'CS500', ago: '4 weeks ago', img: './assets/adc7318cc3d84acb5a00c878c629d81a.jpg', desc: 'Learn coding step-by-step with a patient guide focused on clear logic and good habits.', c: '#3f3a63' },
+  { name: 'Writing Coach', course: 'English 11', ago: '5 days ago', img: './assets/3e50d05d4eb365f37849ac5031b31afa.jpg', desc: 'Find out why a sentence works, then make your own essays sharper, one paragraph at a time.', c: '#9a4f3c' },
+  { name: 'Maths Guide', course: 'Calculus 1', ago: '1 week ago', img: './assets/9351eed22c0de30795952e9f13c7a1ce.jpg', desc: 'Work through problems one move at a time while you take the next step yourself.', c: '#2f6b45' }
+];
+var CHATS = [
+  { q: 'Why does a magnet get weaker when it heats up?', t: 0, when: '2 hours ago' },
+  { q: 'My for-loop runs one time too many', t: 1, when: 'Yesterday' },
+  { q: 'Is my essay intro too long?', t: 2, when: '3 days ago' }
+];
+var BOARD = [{ n: 'Ella M.', c: '#2f5f78', m: 312 }, { n: 'CognitiveCrew', c: '#9a4f3c', m: 274, you: true }, { n: 'Arjun K.', c: '#c0632c', m: 236 }, { n: 'Mia T.', c: '#2f6b45', m: 188 }];
+var LV = ['no sessions', '1 session', '2 sessions', '3 sessions', '4+ sessions'];
+// 364 days of demo session levels, seeded so they never change between renders; recent days kept active for the streak
+var HEAT = (function () {
+  var s = 11, out = [];
+  for (var i = 0; i < 364; i++) {
+    s = (s * 9301 + 49297) % 233280;
+    var r = s / 233280 + (i / 364) * 0.28;
+    var lv = r < 0.46 ? 0 : r < 0.66 ? 1 : r < 0.86 ? 2 : r < 1.06 ? 3 : 4;
+    if (i >= 364 - 12 && lv === 0) lv = 1;
+    out.push(lv);
+  }
+  out[364 - 13] = 0;
+  return out;
+})();
+var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function startOfDay(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { nav: 0, q: '', asked: '', phase: 'none', tutor: 'Physics Mentor', repTutor: '', cl: 0, tu: 0, cell: -1, prof: false, now: Date.now() };
+  }
+  componentDidMount() {
+    var self = this;
+    this.tick = setInterval(function () { self.setState({ now: Date.now() }); }, 30000);
+  }
+  componentWillUnmount() { clearInterval(this.tick); clearTimeout(this.t1); }
+  renderVals() {
+    var self = this, s = this.state;
+    var now = new Date(s.now), today = startOfDay(now);
+    var h = now.getHours();
+    var part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    function dueDate(n) { var d = new Date(today.getTime() + n * DAY); d.setHours(9, 0, 0, 0); return d; }
+    function fmt(d, o) { return d.toLocaleDateString('en-GB', o); }
+
+    // next up = the earliest-due lesson
+    var first = LESSONS[0], fc = CLASSES[first.k], fd = dueDate(first.dueIn);
+    var ms = Math.max(0, fd - now), hh = Math.floor(ms / 3600000), mm = Math.floor((ms % 3600000) / 60000);
+
+    // deadlines list (lessons with due dates + extra items), soonest first
+    var dl = LESSONS.filter(function (l) { return l.dueIn; }).map(function (l) { return { title: l.title, k: l.k, dueIn: l.dueIn, sub: 'Finish the lesson' }; })
+      .concat(EXTRA_DUE).sort(function (a, b) { return a.dueIn - b.dueIn; });
+    var weekCount = dl.filter(function (d) { return d.dueIn <= 7; }).length;
+
+    // heatmap stats
+    var streak = 0; for (var i = HEAT.length - 1; i >= 0 && HEAT[i] > 0; i--) streak++;
+    var best = 0, run = 0; HEAT.forEach(function (v) { run = v > 0 ? run + 1 : 0; if (run > best) best = run; });
+    var total = HEAT.reduce(function (a, b) { return a + b; }, 0);
+    var startDay = new Date(today.getTime() - 363 * DAY);
+    var months = [], lastM = -1;
+    for (var w = 0; w < 52; w++) {
+      var wd = new Date(startDay.getTime() + w * 7 * DAY);
+      if (wd.getMonth() !== lastM) { if (w <= 49) months.push({ name: MON[wd.getMonth()], col: w + 1 }); lastM = wd.getMonth(); }
+    }
+    function cellDate(i) { return new Date(startDay.getTime() + i * DAY); }
+
+    var tutorObj = TUTORS.filter(function (t) { return t.name === s.tutor; })[0] || TUTORS[0];
+    var sugg = [
+      'Quiz me on ' + first.title,
+      'Explain Lenz’s law simply',
+      'Summarise my notes from today',
+      'Plan a 20-minute revision session'
+    ];
+
+    return {
+      dateLabel: fmt(now, { weekday: 'long', day: 'numeric', month: 'long' }),
+      greeting: part + ', CognitiveCrew',
+      navHome: s.nav === 0 ? 'page' : 'false', navClass: s.nav === 1 ? 'page' : 'false', navDue: s.nav === 2 ? 'page' : 'false',
+      goHome: function () { self.setState({ nav: 0 }); }, goClass: function () { self.setState({ nav: 1 }); }, goDue: function () { self.setState({ nav: 2 }); },
+      dueCount: weekCount,
+      classes: Object.keys(CLASSES).map(function (k) { return CLASSES[k]; }),
+      streak: streak, best: best, total: total,
+
+      next: { title: first.title, cls: fc.name, c: fc.c, tint: fc.tint, pct: first.pct, time: first.time,
+        dueLabel: fmt(fd, { weekday: 'short', day: 'numeric', month: 'short' }) + ', 09:00' },
+      countdown: hh + 'h ' + (mm < 10 ? '0' : '') + mm + 'm',
+      thenList: [
+        { title: 'Physics Mentor check-in', sub: '10 min · review yesterday’s quiz', c: CLASSES.phys.c },
+        { title: LESSONS[2].title, sub: 'Next section · about 25 min', c: CLASSES.start.c },
+        { title: 'Flashcards: units of force', sub: '12 cards due', c: CLASSES.phys.c }
+      ],
+
+      tutor: s.tutor,
+      tutorOpts: TUTORS.map(function (t) { return { v: t.name }; }),
+      onTutor: function (e) { self.setState({ tutor: e.target.value }); },
+      q: s.q, noQ: !s.q.trim(),
+      onQ: function (e) { self.setState({ q: e.target.value }); },
+      send: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var q = self.state.q.trim(); if (!q) return;
+        self.setState({ asked: q, q: '', phase: 'think', repTutor: self.state.tutor });
+        clearTimeout(self.t1);
+        self.t1 = setTimeout(function () { self.setState({ phase: 'done' }); }, 1100);
+      },
+      sugg: sugg.map(function (t) { return { label: t, pick: function () { self.setState({ q: t }); var el = document.getElementById('q'); if (el) el.focus(); } }; }),
+      hasReply: s.phase !== 'none', thinking: s.phase === 'think', answered: s.phase === 'done', asked: s.asked, repTutor: s.repTutor || tutorObj.name,
+
+      lessons: LESSONS.slice(s.cl, s.cl + 3).map(function (l) {
+        var c = CLASSES[l.k];
+        return { title: l.title, cls: c.name, c: c.c, tint: c.tint, pct: l.pct, time: l.time, group: !!l.group,
+          due: l.dueIn ? (l.dueIn === 1 ? 'Due tomorrow, 9:00' : 'Due ' + fmt(dueDate(l.dueIn), { day: 'numeric', month: 'short' })) : '',
+          magnet: l.icon === 'magnet', square: l.icon === 'square', bulb: l.icon === 'bulb', beam: l.icon === 'beam', talk: l.icon === 'talk' };
+      }),
+      clPrevOff: s.cl === 0 ? 'true' : 'false', clNextOff: s.cl >= LESSONS.length - 3 ? 'true' : 'false',
+      clPrev: function () { if (self.state.cl > 0) self.setState({ cl: self.state.cl - 1 }); },
+      clNext: function () { if (self.state.cl < LESSONS.length - 3) self.setState({ cl: self.state.cl + 1 }); },
+      tutors: TUTORS.slice(s.tu, s.tu + 2),
+      tuPrevOff: s.tu === 0 ? 'true' : 'false', tuNextOff: s.tu >= TUTORS.length - 2 ? 'true' : 'false',
+      tuPrev: function () { if (self.state.tu > 0) self.setState({ tu: self.state.tu - 2 }); },
+      tuNext: function () { if (self.state.tu < TUTORS.length - 2) self.setState({ tu: self.state.tu + 2 }); },
+
+      months: months,
+      cells: HEAT.map(function (lv, i) {
+        var label = fmt(cellDate(i), { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + LV[lv];
+        return { cls: 'l' + lv, label: label, sel: s.cell === i ? 'true' : 'false', pick: function () { self.setState({ cell: i }); } };
+      }),
+      tip: s.cell >= 0 ? fmt(cellDate(s.cell), { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + LV[HEAT[s.cell]] : 'Hover or tap a day to see your sessions',
+
+      prof: s.prof, profOpen: s.prof ? 'true' : 'false', profText: s.prof ? 'Hide learning profile' : 'Show learning profile',
+      toggleProf: function () { self.setState({ prof: !self.state.prof }); },
+      styles: [
+        { name: 'Seeing & Drawing', v: 85, c: '#9a4f3c' },
+        { name: 'Reading & Writing', v: 26, c: '#2f5f78' },
+        { name: 'Speaking & Listening', v: 21, c: '#2f6b45' }
+      ],
+      deadlines: dl.slice(0, 4).map(function (d) {
+        var c = CLASSES[d.k], dd = dueDate(d.dueIn);
+        return { title: d.title, sub: c.name + ' · ' + d.sub, c: c.c, tint: c.tint, day: dd.getDate(), mon: MON[dd.getMonth()] };
+      }),
+      chats: CHATS.map(function (c) { var t = TUTORS[c.t]; return { q: c.q, who: t.name, when: c.when, c: t.c, init: t.name[0] }; }),
+      board: BOARD.map(function (b, i) {
+        return { rank: '0' + (i + 1), name: b.you ? b.n + ' (you)' : b.n, init: b.n[0], color: b.c, w: Math.round(b.m / BOARD[0].m * 100),
+          time: Math.floor(b.m / 60) + 'h ' + (b.m % 60) + 'm', cls: b.you ? 'you' : '' };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

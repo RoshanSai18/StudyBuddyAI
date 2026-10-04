@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quillo · Learn at the pace you think</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f3e9e6}
+a{color:inherit}a:hover{color:inherit}
+.qx{--ease:cubic-bezier(.2,.7,.2,1);--t-fast:200ms;--t-reveal:600ms;--t-scene:1.2s;
+  --disp:'Bricolage Grotesque',Georgia,serif;--body:'Figtree',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;
+  font-family:var(--body);color:#2a1a17;overflow-x:clip;position:relative}
+.qx *{box-sizing:border-box}
+.qx img{display:block}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:500}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px}
+.skip{position:absolute;left:16px;top:-60px;z-index:200;background:#2a1a17;color:#fff;padding:12px 16px;border-radius:8px;text-decoration:none}
+.skip:focus{top:12px}
+
+/* sections & palettes (from each photo) */
+.sec{position:relative;color:var(--tx);background:linear-gradient(to bottom,var(--prev) 0,var(--bg) 160px,var(--bg) 100%)}
+.sec ::selection{background:var(--ac);color:var(--ai)}
+.sec :focus-visible{outline:3px solid var(--ac);outline-offset:3px;border-radius:6px}
+.sec :focus:not(:focus-visible){outline:none}
+.s1{--bg:#f3e9e6;--prev:#f3e9e6;--sf:#fbf5f2;--bd:#dccbc5;--tx:#2a1a17;--mu:#674b44;--ac:#9a4f3c;--ai:#ffffff}
+.s2{--bg:#1f3326;--prev:#f3e9e6;--sf:#29412f;--bd:#3d5a45;--tx:#eef3ee;--mu:#b9cbbd;--ac:#a6dcb4;--ai:#10261a}
+.s3{--bg:#ecebea;--prev:#1f3326;--sf:#ffffff;--bd:#d3d0ce;--tx:#1d1b1a;--mu:#57514e;--ac:#8a3a17;--ai:#ffffff}
+.s4{--bg:#f6f0f2;--prev:#ecebea;--sf:#ffffff;--bd:#e3d6dc;--tx:#24181e;--mu:#65525c;--ac:#7d3f8f;--ai:#ffffff}
+.s5{--bg:#2b1d14;--prev:#f6f0f2;--sf:#3a281c;--bd:#5a4232;--tx:#f5ece4;--mu:#d2bfb0;--ac:#e7a86b;--ai:#2b1d14}
+.s6{--bg:#e8ecee;--prev:#2b1d14;--sf:#ffffff;--bd:#cdd5da;--tx:#17222a;--mu:#4c5c66;--ac:#2f5f78;--ai:#ffffff}
+.s7{--bg:#140a03;--prev:#e8ecee;--sf:#24170c;--bd:#4a3524;--tx:#f7eadb;--mu:#cdb7a0;--ac:#f0a24a;--ai:#1a0d02}
+
+.eyebrow{color:var(--ac);display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:2px;background:currentColor}
+.h2{font-family:var(--disp);font-weight:700;font-size:clamp(34px,4.2vw,56px);line-height:1.04;letter-spacing:-.02em;margin:14px 0 18px}
+.lede{font-size:19px;line-height:1.6;color:var(--mu);max-width:56ch;margin:0}
+.lede b,.lede strong{color:var(--tx);font-weight:700}
+
+/* reveal */
+.rv{opacity:0;translate:0 18px;transition:opacity var(--t-reveal) var(--ease),translate var(--t-reveal) var(--ease);transition-delay:calc(var(--i,0) * 90ms)}
+.w{display:inline-block;opacity:0;translate:0 .4em;transition:opacity var(--t-reveal) var(--ease),translate var(--t-reveal) var(--ease);transition-delay:calc(var(--i,0) * 60ms)}
+[data-in] .rv,[data-in] .w{opacity:1;translate:0 0}
+
+/* photos */
+.ph{position:relative;overflow:hidden;background:var(--sf);cursor:crosshair}
+.ph > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.plx{scale:1.14;translate:0 var(--p,0px);will-change:translate}
+.slot{display:none}
+
+/* buttons */
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;font:600 16px/1 var(--body);text-decoration:none;border:2px solid transparent;cursor:pointer;
+  transform:translate(var(--tx2,0px),var(--ty,0px));transition:transform var(--t-fast) var(--ease),background var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.btn-p{background:var(--ac);color:var(--ai)}
+.btn-p:hover{color:var(--ai);box-shadow:0 10px 24px -10px var(--ac)}
+.btn-g{background:transparent;color:var(--tx);border-color:var(--bd)}
+.btn-g:hover{color:var(--tx);border-color:var(--tx)}
+.mag{--tx2:var(--mx2,0px)}
+.btn::after{content:"";position:absolute;left:var(--rx,50%);top:var(--ry,50%);width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:rgba(255,255,255,.55);opacity:0;scale:0;pointer-events:none}
+.btn[data-rip]::after{animation:rip 600ms var(--ease)}
+@keyframes rip{0%{opacity:.7;scale:0}100%{opacity:0;scale:22}}
+
+/* spotlight cards */
+.spot{position:relative;background:var(--sf);border:1px solid var(--bd);border-radius:18px;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.spot::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--ac) 22%,transparent),transparent 70%)}
+.spot:hover{transform:translateY(-3px);box-shadow:0 18px 40px -22px rgba(0,0,0,.45)}
+.spot:hover::before{opacity:1}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;height:80px;z-index:100;background:var(--nbg);color:var(--ntx);
+  transition:background var(--t-reveal) var(--ease),color var(--t-reveal) var(--ease);border-bottom:1px solid color-mix(in srgb,var(--ntx) 14%,transparent)}
+.nav ::selection{background:var(--nac);color:var(--nai)}
+.nav :focus-visible{outline:3px solid var(--nac);outline-offset:3px;border-radius:6px}
+.nav-in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font:800 24px/1 var(--disp);letter-spacing:-.02em;min-height:44px}
+.logo svg{color:var(--nac);transition:color var(--t-reveal) var(--ease)}
+.links{display:flex;gap:4px;list-style:none;margin:0;padding:0}
+.links a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;text-decoration:none;font-weight:600;font-size:15px;position:relative;opacity:.82}
+.links a:hover{opacity:1}
+.links a[aria-current="true"]{opacity:1}
+.links a[aria-current="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:2px;background:var(--nac)}
+.nav-cta{display:flex;align-items:center;gap:10px}
+.nav .btn{min-height:44px;padding:0 18px;font-size:15px}
+.nav .btn-p{background:var(--nac);color:var(--nai)}
+.nav .btn-g{color:var(--ntx);border-color:color-mix(in srgb,var(--ntx) 30%,transparent)}
+.prog{position:absolute;left:0;bottom:-1px;height:3px;background:var(--nac);transition:background var(--t-reveal) var(--ease)}
+.menu-btn{display:none;width:44px;height:44px;border-radius:10px;border:1px solid color-mix(in srgb,var(--ntx) 30%,transparent);background:transparent;color:inherit;align-items:center;justify-content:center;cursor:pointer}
+.drop{position:absolute;top:80px;left:0;right:0;background:var(--nbg);border-bottom:1px solid color-mix(in srgb,var(--ntx) 14%,transparent);padding:8px 16px 18px}
+.drop a{display:flex;align-items:center;min-height:48px;text-decoration:none;font-weight:600;border-bottom:1px solid color-mix(in srgb,var(--ntx) 10%,transparent)}
+.dots{position:fixed;right:22px;top:50%;translate:0 -50%;z-index:90;display:flex;flex-direction:column;gap:2px}
+.dot{width:44px;height:30px;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.dot span{width:9px;height:9px;border-radius:50%;border:2px solid var(--nac);transition:all var(--t-fast) var(--ease);background:transparent}
+.dot[aria-current="true"] span{background:var(--nac);height:22px;border-radius:6px}
+.dot:focus-visible{outline:3px solid var(--nac);outline-offset:-2px;border-radius:8px}
+
+/* HERO */
+.hero{min-height:860px;padding-top:80px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+.hero-copy{padding:90px 56px 64px max(40px,calc((100vw - 1280px)/2 + 40px));display:flex;flex-direction:column;justify-content:center;gap:26px}
+.h1{font-family:var(--disp);font-weight:800;font-size:clamp(44px,5.6vw,84px);line-height:.98;letter-spacing:-.035em;margin:0}
+.h1 em{font-style:normal;color:var(--ac)}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px}
+.hero .ph{min-height:620px;border-radius:0 0 0 36px}
+.frame{position:absolute;left:33%;top:37%;width:30%;height:38%;border:2px solid #fff;border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.2),0 0 26px rgba(255,255,255,.35);animation:pulse 2.4s ease-in-out infinite;z-index:3}
+.frame i{position:absolute;width:18px;height:18px;border-color:#fff;border-style:solid}
+.frame .c1{left:-8px;top:-8px;border-width:3px 0 0 3px}.frame .c2{right:-8px;top:-8px;border-width:3px 3px 0 0}
+.frame .c3{left:-8px;bottom:-8px;border-width:0 0 3px 3px}.frame .c4{right:-8px;bottom:-8px;border-width:0 3px 3px 0}
+.frame .lab{position:absolute;left:-2px;top:-34px;background:#fff;color:#2a1a17;padding:6px 9px;border-radius:5px;font-size:11px;white-space:nowrap}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 1px rgba(0,0,0,.2),0 0 12px rgba(255,255,255,.25)}50%{box-shadow:0 0 0 1px rgba(0,0,0,.2),0 0 34px rgba(255,255,255,.7)}}
+.scan{position:absolute;left:0;right:0;top:0;height:120px;z-index:2;pointer-events:none;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.28) 85%,rgba(255,255,255,.75) 100%);animation:scan 6s linear infinite}
+@keyframes scan{0%{translate:0 -130px}100%{translate:0 760px}}
+.hud{position:absolute;right:24px;bottom:24px;z-index:4;background:#2a1a17;color:#fbf5f2;border-radius:14px;padding:16px 18px;min-width:240px;display:grid;gap:10px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6)}
+.hud-row{display:flex;justify-content:space-between;gap:18px;align-items:baseline}
+.hud .k{color:#d9c3bb;font-size:11px}
+.hud .v{font:600 15px/1 var(--mono);letter-spacing:.06em}
+.live{display:inline-flex;align-items:center;gap:8px;color:#ffb39e}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:#ff8a6b;animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:.2}}
+
+/* TUTORS */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:760px}
+.split .ph{min-height:560px}
+.split-copy{padding:120px max(40px,calc((100vw - 1280px)/2 + 40px)) 110px 64px;display:flex;flex-direction:column;justify-content:center}
+.tgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:36px}
+.tcard{padding:22px;display:grid;gap:10px}
+.tcard h3{margin:0;font:700 20px/1.2 var(--disp)}
+.tcard p{margin:0;color:var(--mu);line-height:1.55;font-size:15.5px}
+.ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac)}
+
+/* NOTES SLIDER */
+.pad{padding:130px 0 120px}
+.ba{position:relative;aspect-ratio:16/9;border-radius:24px;overflow:hidden;margin-top:44px;border:1px solid var(--bd);cursor:crosshair}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba .raw img{filter:grayscale(.55) contrast(1.05)}
+.ba .ai{position:absolute;inset:0;z-index:2}
+.ba .ai img{filter:saturate(1.2) brightness(.9)}
+.ba .tint{position:absolute;inset:0;background:rgba(138,58,23,.18)}
+.box{position:absolute;border:2px solid #fff;border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.box span{position:absolute;left:-2px;top:-30px;background:#fff;color:#1d1b1a;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:7px 8px;border-radius:5px;white-space:nowrap}
+.box.gap{border-style:dashed;border-color:#ffd2bd}.box.gap span{background:#8a3a17;color:#fff}
+.ba-tag{position:absolute;top:18px;z-index:3;background:rgba(29,27,26,.8);color:#fff;padding:8px 11px;border-radius:6px;font-size:11px}
+.ba-handle{position:absolute;top:0;bottom:0;z-index:4;width:2px;background:#fff;pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.ba-handle b{position:absolute;top:50%;left:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:#fff;color:#1d1b1a;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;z-index:5;cursor:ew-resize;margin:0}
+.ba:has(input:focus-visible){outline:3px solid var(--ac);outline-offset:4px}
+
+/* STYLE PANEL */
+.bgsec{position:relative;min-height:820px;display:flex;align-items:center;overflow:hidden}
+.bgsec > .ph{position:absolute;inset:0;background:transparent}
+.bgsec .wrap{position:relative;z-index:2;width:100%;display:flex;justify-content:flex-end;padding-top:120px;padding-bottom:120px}
+.panel{background:var(--sf);border:1px solid var(--bd);border-radius:24px;padding:44px;max-width:620px;width:100%;box-shadow:0 30px 70px -40px rgba(36,24,30,.6)}
+.term{margin-top:28px;background:#241a22;color:#f3e6ee;border-radius:14px;padding:22px 22px 24px;font:500 14.5px/1.9 var(--mono);display:grid}
+.term .ln{white-space:pre;overflow:hidden;clip-path:inset(0 100% 0 0)}
+.term .ok{color:#e9bdf3}
+[data-in] .term .ln{animation:type 700ms steps(28) forwards;animation-delay:calc(var(--i) * 620ms + 300ms)}
+@keyframes type{to{clip-path:inset(0 0 0 0)}}
+.caret{display:inline-block;width:9px;height:17px;background:#e9bdf3;vertical-align:-3px;margin-left:4px;animation:blink 1s steps(2) infinite}
+
+/* WORKFLOW */
+.strip{aspect-ratio:21/7;border-radius:24px;margin-top:40px}
+.flow{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:64px;margin-top:64px}
+.steps{position:relative;list-style:none;margin:0;padding:0;display:grid;gap:30px}
+.steps::before{content:"";position:absolute;left:27px;top:28px;bottom:28px;width:2px;background:var(--bd)}
+.steps::after{content:"";position:absolute;left:27px;top:28px;bottom:28px;width:2px;background:var(--ac);transform-origin:top;scale:1 0;transition:scale var(--t-scene) var(--ease)}
+[data-in] .steps::after{scale:1 1}
+.step{position:relative;display:grid;grid-template-columns:56px minmax(0,1fr);gap:22px;align-items:start}
+.num{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font:600 18px/1 var(--mono);background:var(--bg);border:2px solid var(--bd);color:var(--mu);position:relative;z-index:1;transition:all var(--t-reveal) var(--ease);transition-delay:calc(var(--i) * 300ms + 200ms)}
+[data-in] .num{background:var(--ac);border-color:var(--ac);color:var(--ai)}
+.step h3{margin:6px 0 8px;font:700 23px/1.2 var(--disp)}
+.step p{margin:0;color:var(--mu);line-height:1.6}
+
+/* INSIDE / PIPELINE */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:36px;align-items:center}
+.tab{min-height:46px;padding:0 16px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:600 15px/1 var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:all var(--t-fast) var(--ease)}
+.tab .mono{font-size:11px;color:var(--mu)}
+.tab[aria-selected="true"]{background:var(--ac);color:var(--ai);border-color:var(--ac)}
+.tab[aria-selected="true"] .mono{color:var(--ai)}
+.play{margin-left:auto;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--bd);background:transparent;color:var(--tx);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:600 14px/1 var(--body)}
+.pipe{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:32px;margin-top:24px;align-items:stretch}
+.stage{position:relative;aspect-ratio:16/10;border-radius:22px;overflow:hidden;border:1px solid var(--bd)}
+.stage > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.9)}
+.ly{position:absolute;z-index:3;animation:pop var(--t-reveal) var(--ease) both}
+@keyframes pop{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+.bub{left:6%;top:8%;background:#fff;color:#17222a;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:46%;font-weight:600;box-shadow:0 12px 30px -14px rgba(0,0,0,.5)}
+.ctx{border:2px dashed #fff;border-radius:8px}
+.ctx span{position:absolute;left:-2px;bottom:-30px;background:#2f5f78;color:#fff;font:600 11px/1 var(--mono);letter-spacing:.08em;padding:7px 8px;border-radius:5px;white-space:nowrap}
+.exp{right:5%;top:10%;width:40%;background:#17222a;color:#e8ecee;border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.5}
+.chk{left:6%;bottom:9%;background:#fff;color:#17222a;border-radius:14px;padding:12px 14px;display:grid;gap:6px;font-size:14px;min-width:38%}
+.chk div{display:flex;gap:8px;align-items:center}
+.mem{right:5%;bottom:9%;background:#2f5f78;color:#fff;border-radius:14px;padding:12px 16px;font-size:14px}
+.desc{padding:30px;display:flex;flex-direction:column;gap:14px}
+.desc h3{margin:0;font:700 30px/1.1 var(--disp)}
+.desc p{margin:0;color:var(--mu);line-height:1.65;font-size:17px}
+.bar{height:4px;border-radius:4px;background:var(--bd);overflow:hidden;margin-top:auto}
+.bar i{display:block;height:100%;background:var(--ac);width:0}
+.bar i.run.k0{animation:fill0 4s linear forwards}
+.bar i.run.k1{animation:fill1 4s linear forwards}
+@keyframes fill0{from{width:0}to{width:100%}}
+@keyframes fill1{from{width:0}to{width:100%}}
+
+/* CTA */
+.cta{position:relative;min-height:760px;display:flex;align-items:center;overflow:hidden}
+.cta > .ph{position:absolute;inset:0;background:transparent}
+.cta-panel{position:relative;z-index:2;margin:140px auto;max-width:760px;text-align:center;background:var(--bg);border:1px solid var(--bd);border-radius:28px;padding:56px 48px;display:grid;gap:20px;justify-items:center}
+.cta-panel .h2{margin:0}
+.foot{background:var(--bg);color:var(--mu);border-top:1px solid var(--bd)}
+.foot-in{display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;padding-top:34px;padding-bottom:40px}
+.foot a{text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.foot a:hover{color:var(--tx)}
+.foot .logo{color:var(--tx)}
+.foot .logo svg{color:var(--ac)}
+
+@media (max-width:1100px){
+  .hero,.split,.flow,.pipe{grid-template-columns:minmax(0,1fr)}
+  .hero-copy{padding:70px 40px 40px}
+  .hero .ph{min-height:480px;border-radius:0}
+  .split .ph{min-height:380px;order:-1}
+  .split-copy{padding:72px 40px 90px}
+  .flow{gap:40px}
+  .links{display:none}
+  .menu-btn{display:inline-flex}
+}
+@media (max-width:760px){
+  .wrap{padding:0 20px}
+  .hero-copy{padding:56px 20px 32px}
+  .split-copy{padding:56px 20px 72px}
+  .tgrid{grid-template-columns:minmax(0,1fr)}
+  .dots{display:none}
+  .nav-cta .btn-g{display:none}
+  .lede{font-size:17px}
+  .pad{padding:90px 0 80px}
+  .panel{padding:28px 22px}
+  .term{font-size:12px;padding:16px}
+  .hud{left:16px;right:16px;bottom:16px;min-width:0}
+  .strip{aspect-ratio:16/9}
+  .cta-panel{margin:90px 20px;padding:40px 22px}
+  .box span{font-size:9px;padding:5px 6px;top:-24px}
+  .play{margin-left:0}
+}
+@media (max-width:520px){
+  .nav .btn-p{padding:0 14px}
+  .frame .lab{font-size:10px}
+  .box.hide-s{display:none}
+  .h1{font-size:40px}
+}
+@media (prefers-reduced-motion:reduce){
+  .qx *,.qx *::before,.qx *::after{animation:none !important;transition:none !important}
+  .rv,.w{opacity:1 !important;translate:none !important}
+  .term .ln{clip-path:none !important}
+  .num{background:var(--ac) !important;border-color:var(--ac) !important;color:var(--ai) !important}
+  .steps::after{scale:1 1 !important}
+  .plx{translate:none !important}
+  .scan{display:none}
+}
+</style>
+</helmet>
+<div class="qx">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" style="--nbg: {{nav.bg}}; --ntx: {{nav.tx}}; --nac: {{nav.ac}}; --nai: {{nav.ai}}">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="Quillo home">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="13.5" r="9.5"></circle><path d="M20.5 20.5l6 6"></path><path d="M9 16c1.5-4.5 5-7 9-7.5"></path></svg>
+      <span>Quillo</span>
+    </a>
+    <nav aria-label="Sections">
+      <ul class="links">
+        <sc-for list="{{links}}" as="l" hint-placeholder-count="6">
+          <li><a href="{{l.href}}" aria-current="{{l.cur}}">{{l.label}}</a></li>
+        </sc-for>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-g" href="Login.dc.html">Log in</a>
+      <a class="btn btn-p mag" href="Login.dc.html">Get started</a>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="{{menuOpen}}" onClick="{{toggleMenu}}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
+    </div>
+  </div>
+  <div class="prog" style="width: {{progPct}}%"></div>
+  <sc-if value="{{menu}}" hint-placeholder-val="{{ false }}">
+    <div class="drop">
+      <sc-for list="{{links}}" as="l" hint-placeholder-count="6">
+        <a href="{{l.href}}" onClick="{{closeMenu}}">{{l.label}}</a>
+      </sc-for>
+      <a href="Login.dc.html">Log in</a>
+    </div>
+  </sc-if>
+</header>
+
+<div class="dots" style="--nac: {{nav.ac}}" aria-label="Jump to section">
+  <sc-for list="{{dots}}" as="d" hint-placeholder-count="7">
+    <button class="dot" type="button" aria-label="{{d.label}}" aria-current="{{d.cur}}" onClick="{{d.go}}"><span></span></button>
+  </sc-for>
+</div>
+
+<main id="main">
+
+<!-- 1 HERO -->
+<section id="top" class="sec s1 hero" data-sec="0" data-rv="1" data-in="1" aria-labelledby="h-hero">
+  <div class="hero-copy">
+    <span class="mono eyebrow rv" style="--i:0">AI study companion</span>
+    <h1 id="h-hero" class="h1"><span class="w" style="--i:0">Learn</span> <span class="w" style="--i:1">anything,</span> <span class="w" style="--i:2">at</span> <span class="w" style="--i:3">the</span> <span class="w" style="--i:4">pace</span> <span class="w" style="--i:5">you</span> <em class="w" style="--i:6">think.</em></h1>
+    <p class="lede rv" style="--i:3">Quillo is a patient AI tutor that <b>explains, quizzes and remembers how you learn</b>, so every study session picks up where the last one left off.</p>
+    <div class="cta-row rv" style="--i:4">
+      <a class="btn btn-p mag" href="Login.dc.html">Get started
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      <a class="btn btn-g" href="#inside">Explore how it works</a>
+    </div>
+  </div>
+  <div class="ph" role="img" aria-label="A student writing notes at a desk">
+    <img src="./assets/bbee8eb5076cbc88531194c627249c40.jpg" alt="">
+    <div class="scan"></div>
+    <div class="frame"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><span class="lab mono">Desk 01 · {{phase}}</span></div>
+    <div class="hud" aria-live="polite">
+      <div class="hud-row"><span class="mono live">Live session</span><span class="v">{{clock}}</span></div>
+      <div class="hud-row"><span class="mono k">Now</span><span class="v">{{phase}}</span></div>
+      <div class="hud-row"><span class="mono k">Understanding</span><span class="v">{{under}}</span></div>
+    </div>
+    <span class="slot mono">Photo · 01-hero.jpg</span>
+  </div>
+</section>
+
+<!-- 2 TUTORS -->
+<section id="tutors" class="sec s2 split" data-sec="1" data-rv="1" aria-labelledby="h-tutors">
+  <div class="ph" role="img" aria-label="Equations chalked on a green board">
+    <img class="plx" src="./assets/1c207780c05dacf92bf0678a5bd93ca7.jpg" alt="">
+    <span class="slot mono">Photo · 02-tutors.jpg</span>
+  </div>
+  <div class="split-copy">
+    <span class="mono eyebrow rv" style="--i:0">Tutors</span>
+    <h2 id="h-tutors" class="h2"><span class="w" style="--i:0">Tutors</span> <span class="w" style="--i:1">that</span> <span class="w" style="--i:2">never</span> <span class="w" style="--i:3">run</span> <span class="w" style="--i:4">out</span> <span class="w" style="--i:5">of</span> <span class="w" style="--i:6">patience.</span></h2>
+    <p class="lede rv" style="--i:2">Each tutor is tuned to one subject and one way of teaching. Ask the same question five times and you get <b>five fresh explanations</b>, never a sigh.</p>
+    <div class="tgrid">
+      <article class="spot tcard rv" style="--i:3">
+        <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"></path></svg></div>
+        <h3>Coding Tutor</h3><p>Step-by-step help that reads your code before it suggests anything.</p>
+      </article>
+      <article class="spot tcard rv" style="--i:4">
+        <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="2"></circle><ellipse cx="12" cy="12" rx="9" ry="3.6"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(-60 12 12)"></ellipse></svg></div>
+        <h3>Physics Mentor</h3><p>Connects every equation to something you can see, push or drop.</p>
+      </article>
+      <article class="spot tcard rv" style="--i:5">
+        <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg></div>
+        <h3>Writing Coach</h3><p>Shows you why a sentence works instead of rewriting it for you.</p>
+      </article>
+      <article class="spot tcard rv" style="--i:6">
+        <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5h14v14H5z"></path><path d="M9 9l6 6M15 9l-6 6"></path></svg></div>
+        <h3>Maths Guide</h3><p>Works through problems one move at a time and lets you take the next step.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 3 NOTES (before / after) -->
+<section id="notes" class="sec s3 pad" data-sec="2" data-rv="1" aria-labelledby="h-notes">
+  <div class="wrap">
+    <span class="mono eyebrow rv" style="--i:0">Your notes</span>
+    <h2 id="h-notes" class="h2"><span class="w" style="--i:0">Bring</span> <span class="w" style="--i:1">your</span> <span class="w" style="--i:2">notes.</span> <span class="w" style="--i:3">Quillo</span> <span class="w" style="--i:4">finds</span> <span class="w" style="--i:5">the</span> <span class="w" style="--i:6">ideas</span> <span class="w" style="--i:7">inside.</span></h2>
+    <p class="lede rv" style="--i:2">Snap a page and Quillo picks out <b>definitions, formulas and the gaps</b> you haven't filled yet. Drag the handle to compare.</p>
+    <div class="ba rv" style="--i:3">
+      <div class="raw"><img src="./assets/3e50d05d4eb365f37849ac5031b31afa.jpg" alt=""></div>
+      <div class="ai" style="clip-path: inset(0 0 0 {{split}}%)">
+        <img src="./assets/3e50d05d4eb365f37849ac5031b31afa.jpg" alt="">
+        <div class="tint"></div>
+        <div class="box" style="left:26%;top:14%;width:30%;height:16%"><span>Definition · Force</span></div>
+        <div class="box" style="left:62%;top:24%;width:24%;height:14%"><span>Formula · F = ma</span></div>
+        <div class="box gap" style="left:55%;top:52%;width:32%;height:16%"><span>Gap · units missing</span></div>
+        <div class="box hide-s" style="left:28%;top:44%;width:22%;height:24%"><span>Worked example</span></div>
+      </div>
+      <span class="ba-tag mono" style="left:18px">Your notes</span>
+      <span class="ba-tag mono" style="right:18px;z-index:3">What Quillo sees</span>
+      <div class="ba-handle" style="left: {{split}}%"><b><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"></path></svg></b></div>
+      <input type="range" min="0" max="100" step="1" value="{{split}}" onChange="{{onSplit}}" onInput="{{onSplit}}" aria-label="Compare your notes with what Quillo sees">
+      <span class="slot mono" style="z-index:6">Photo · 03-notes.jpg</span>
+    </div>
+  </div>
+</section>
+
+<!-- 4 STYLE PANEL -->
+<section id="style" class="sec s4 bgsec" data-sec="3" data-rv="1" aria-labelledby="h-style">
+  <div class="ph" role="img" aria-label="Coloured pencils lined up on a white surface">
+    <img class="plx" src="./assets/1574633a6e648b41ae7c481af2217bd1.jpg" alt="">
+    <span class="slot mono">Photo · 04-style.jpg</span>
+  </div>
+  <div class="wrap">
+    <div class="panel rv" style="--i:0">
+      <span class="mono eyebrow">How you learn</span>
+      <h2 id="h-style" class="h2"><span class="w" style="--i:0">It</span> <span class="w" style="--i:1">learns</span> <span class="w" style="--i:2">how</span> <span class="w" style="--i:3">you</span> <span class="w" style="--i:4">learn.</span></h2>
+      <p class="lede">After a few sessions Quillo knows whether you'd rather <b>see a diagram, read a summary or talk it through</b>, and it starts there.</p>
+      <div class="term" aria-label="Learning profile loading">
+        <span class="ln" style="--i:0">&gt; profile.load("you")</span>
+        <span class="ln" style="--i:1">seeing &amp; drawing ...... <span class="ok">strong</span></span>
+        <span class="ln" style="--i:2">reading &amp; writing ..... building</span>
+        <span class="ln" style="--i:3">speaking &amp; listening .. building</span>
+        <span class="ln" style="--i:4">pace .................. steady</span>
+        <span class="ln" style="--i:5"><span class="ok">next: diagram-first explanations</span><span class="caret"></span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 WORKFLOW -->
+<section id="flow" class="sec s5 pad" data-sec="4" data-rv="1" aria-labelledby="h-flow">
+  <div class="wrap">
+    <span class="mono eyebrow rv" style="--i:0">How it flows</span>
+    <h2 id="h-flow" class="h2"><span class="w" style="--i:0">From</span> <span class="w" style="--i:1">first</span> <span class="w" style="--i:2">question</span> <span class="w" style="--i:3">to</span> <span class="w" style="--i:4">a</span> <span class="w" style="--i:5">habit.</span></h2>
+    <div class="ph strip rv" style="--i:1" role="img" aria-label="Shelves of books in an old bookshop">
+      <img class="plx" src="./assets/f24128e61622260f593c160b591dccea.jpg" alt="">
+      <span class="slot mono">Photo · 05-flow.jpg</span>
+    </div>
+    <div class="flow">
+      <p class="lede rv" style="--i:2">Four steps, and you only have to remember the first one. <b>Quillo keeps track of the rest</b>: what's due, what's shaky, and what you've already nailed.</p>
+      <ol class="steps">
+        <li class="step"><span class="num" style="--i:0">01</span><div><h3>Join a classroom</h3><p>Use your teacher's code, or start a solo space for any subject.</p></div></li>
+        <li class="step"><span class="num" style="--i:1">02</span><div><h3>Ask anything</h3><p>Type, talk or snap a photo of the page you're stuck on.</p></div></li>
+        <li class="step"><span class="num" style="--i:2">03</span><div><h3>Practise until it clicks</h3><p>Short quizzes check your understanding and loop back to the gaps.</p></div></li>
+        <li class="step"><span class="num" style="--i:3">04</span><div><h3>Watch your streak grow</h3><p>Every session lands on your progress map, ready for tomorrow.</p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 6 INSIDE -->
+<section id="inside" class="sec s6 pad" data-sec="5" data-rv="1" aria-labelledby="h-inside">
+  <div class="wrap">
+    <span class="mono eyebrow rv" style="--i:0">Inside Quillo</span>
+    <h2 id="h-inside" class="h2"><span class="w" style="--i:0">What</span> <span class="w" style="--i:1">happens</span> <span class="w" style="--i:2">after</span> <span class="w" style="--i:3">you</span> <span class="w" style="--i:4">hit</span> <span class="w" style="--i:5">ask.</span></h2>
+    <div class="tabs rv" style="--i:1" role="tablist" aria-label="Pipeline stages">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+        <button class="tab" type="button" role="tab" aria-selected="{{s.sel}}" onClick="{{s.pick}}"><span class="mono">{{s.n}}</span>{{s.label}}</button>
+      </sc-for>
+      <button class="play" type="button" onClick="{{togglePlay}}" aria-label="{{playLabel}}">
+        <sc-if value="{{playing}}" hint-placeholder-val="{{ true }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M8 5v14M16 5v14"></path></svg>
+        </sc-if>
+        <sc-if value="{{paused}}" hint-placeholder-val="{{ false }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"></path></svg>
+        </sc-if>
+        {{playText}}
+      </button>
+    </div>
+    <div class="pipe rv" style="--i:2">
+      <div class="stage" role="tabpanel" aria-label="{{cur.label}}">
+        <img src="./assets/9351eed22c0de30795952e9f13c7a1ce.jpg" alt="A microscope on a lab bench">
+        <div class="ly bub">Why does a heavier object need more force to speed up?</div>
+        <sc-if value="{{l1}}" hint-placeholder-val="{{ false }}">
+          <div class="ly ctx" style="left:8%;top:42%;width:28%;height:20%"><span>Physics 12A · week 3</span></div>
+          <div class="ly ctx" style="left:40%;top:56%;width:20%;height:18%"><span>Your notes · p.4</span></div>
+        </sc-if>
+        <sc-if value="{{l2}}" hint-placeholder-val="{{ false }}">
+          <div class="ly exp"><b>F = m × a.</b> Same push, more mass, so less acceleration. Picture pushing an empty trolley, then a full one.</div>
+        </sc-if>
+        <sc-if value="{{l3}}" hint-placeholder-val="{{ false }}">
+          <div class="ly chk"><div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2f7a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Q1 · mass vs. acceleration</div><div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2f7a4a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Q2 · units of force</div></div>
+        </sc-if>
+        <sc-if value="{{l4}}" hint-placeholder-val="{{ false }}">
+          <div class="ly mem">Saved · review in 3 days</div>
+        </sc-if>
+        <span class="slot mono">Photo · 06-lab.jpg</span>
+      </div>
+      <div class="spot desc">
+        <span class="mono" style="color:var(--ac)">Stage {{cur.n}} of 5</span>
+        <h3>{{cur.label}}</h3>
+        <p>{{cur.text}}</p>
+        <div class="bar"><i class="{{barCls}}" style="width: {{barW}}"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 CTA -->
+<section id="start" class="sec s7" data-sec="6" data-rv="1" aria-labelledby="h-cta">
+  <div class="cta">
+    <div class="ph" role="img" aria-label="A desk at night lit by a candle, with a laptop and books">
+      <img class="plx" src="./assets/adc7318cc3d84acb5a00c878c629d81a.jpg" alt="">
+      <span class="slot mono">Photo · 07-cta.jpg</span>
+    </div>
+    <div class="cta-panel">
+      <span class="mono eyebrow rv" style="--i:0">Start tonight</span>
+      <h2 id="h-cta" class="h2"><span class="w" style="--i:0">Your</span> <span class="w" style="--i:1">next</span> <span class="w" style="--i:2">study</span> <span class="w" style="--i:3">session</span> <span class="w" style="--i:4">starts</span> <span class="w" style="--i:5">here.</span></h2>
+      <p class="lede rv" style="--i:2">Join a classroom or start on your own. <b>It takes about a minute.</b></p>
+      <div class="cta-row rv" style="--i:3;justify-content:center">
+        <a class="btn btn-p mag" href="Login.dc.html">Get started</a>
+        <a class="btn btn-g" href="Login.dc.html">I already have an account</a>
+      </div>
+    </div>
+  </div>
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <a class="logo" href="#top"><svg width="26" height="26" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="13.5" r="9.5"></circle><path d="M20.5 20.5l6 6"></path><path d="M9 16c1.5-4.5 5-7 9-7.5"></path></svg><span>Quillo</span></a>
+      <nav aria-label="Footer" style="display:flex;flex-wrap:wrap;gap:22px">
+        <a href="#tutors">Tutors</a><a href="#notes">Notes</a><a href="#inside">How it works</a><a href="Login.dc.html">Log in</a>
+      </nav>
+      <span class="mono" style="font-size:11px">© 2026 Quillo</span>
+    </div>
+  </footer>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":6200}}'>
+var PAL = [
+  { bg: '#f3e9e6', tx: '#2a1a17', ac: '#9a4f3c', ai: '#ffffff' },
+  { bg: '#1f3326', tx: '#eef3ee', ac: '#a6dcb4', ai: '#10261a' },
+  { bg: '#ecebea', tx: '#1d1b1a', ac: '#8a3a17', ai: '#ffffff' },
+  { bg: '#f6f0f2', tx: '#24181e', ac: '#7d3f8f', ai: '#ffffff' },
+  { bg: '#2b1d14', tx: '#f5ece4', ac: '#e7a86b', ai: '#2b1d14' },
+  { bg: '#e8ecee', tx: '#17222a', ac: '#2f5f78', ai: '#ffffff' },
+  { bg: '#140a03', tx: '#f7eadb', ac: '#f0a24a', ai: '#1a0d02' }
+];
+var LINKS = [
+  { href: '#tutors', label: 'Tutors', sec: 1 },
+  { href: '#notes', label: 'Notes', sec: 2 },
+  { href: '#style', label: 'Your style', sec: 3 },
+  { href: '#flow', label: 'How it flows', sec: 4 },
+  { href: '#inside', label: 'Inside', sec: 5 },
+  { href: '#start', label: 'Start', sec: 6 }
+];
+var DOTS = ['Top', 'Tutors', 'Notes', 'Your style', 'How it flows', 'Inside', 'Start'];
+var IDS = ['top', 'tutors', 'notes', 'style', 'flow', 'inside', 'start'];
+var STEPS = [
+  { n: 'A', label: 'Question', text: 'You ask in your own words: typed, spoken, or as a photo of the page. Quillo restates it to make sure it heard you right.' },
+  { n: 'B', label: 'Context', text: 'It pulls in your classroom, this week’s topic and your own notes, so the answer fits what you are actually studying.' },
+  { n: 'C', label: 'Explanation', text: 'The explanation starts in your strongest style (a picture, a summary or an everyday example) and builds up from there.' },
+  { n: 'D', label: 'Check', text: 'Two or three quick questions confirm it landed. Miss one and Quillo explains it a different way.' },
+  { n: 'E', label: 'Memory', text: 'What you learned is saved to your map and scheduled for a short review before it fades.' }
+];
+var PHASES = ['READING', 'HIGHLIGHTING', 'EXPLAINING'];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cur: 0, prog: 0, menu: false, split: 50, step: 0, playing: true, tick: 0, now: Date.now(), stepKey: 0 };
+  }
+  componentDidMount() {
+    var self = this;
+    try { this.reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { this.reduce = false; }
+    this.onScroll = function () {
+      if (self.raf) return;
+      self.raf = requestAnimationFrame(function () { self.raf = 0; self.measure(); });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    document.addEventListener('scroll', this.onScroll, { passive: true, capture: true });
+    window.addEventListener('resize', this.onScroll);
+    var els = document.querySelectorAll('[data-rv]');
+    if ('IntersectionObserver' in window && !this.reduce) {
+      this.io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { e.target.setAttribute('data-in', '1'); self.io.unobserve(e.target); }
+        });
+      }, { threshold: 0.15 });
+      els.forEach(function (el) { self.io.observe(el); });
+    } else {
+      els.forEach(function (el) { el.setAttribute('data-in', '1'); });
+    }
+    this.clock = setInterval(function () { self.setState({ now: Date.now(), tick: self.state.tick + 1 }); }, 1000);
+    this.auto = setInterval(function () {
+      if (self.state.playing && !self.reduce) self.setState({ step: (self.state.step + 1) % 5, stepKey: self.state.stepKey + 1 });
+    }, 4000);
+    this.onMove = function (e) {
+      var t = e.target && e.target.closest ? e.target : null;
+      var sp = t ? t.closest('.spot') : null;
+      if (sp) {
+        var r = sp.getBoundingClientRect();
+        sp.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        sp.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      }
+      var m = t ? t.closest('.mag') : null;
+      if (self.lastMag && self.lastMag !== m) { self.lastMag.style.setProperty('--mx2', '0px'); self.lastMag.style.setProperty('--ty', '0px'); }
+      if (m && !self.reduce) {
+        var b = m.getBoundingClientRect();
+        var dx = (e.clientX - (b.left + b.width / 2)) / b.width;
+        var dy = (e.clientY - (b.top + b.height / 2)) / b.height;
+        m.style.setProperty('--mx2', (dx * 12).toFixed(1) + 'px');
+        m.style.setProperty('--ty', (dy * 12).toFixed(1) + 'px');
+      }
+      self.lastMag = m;
+    };
+    this.onDown = function (e) {
+      var m = e.target && e.target.closest ? e.target.closest('.btn') : null;
+      if (!m || self.reduce) return;
+      var b = m.getBoundingClientRect();
+      m.style.setProperty('--rx', (e.clientX - b.left) + 'px');
+      m.style.setProperty('--ry', (e.clientY - b.top) + 'px');
+      m.removeAttribute('data-rip'); void m.offsetWidth; m.setAttribute('data-rip', '1');
+    };
+    document.addEventListener('pointermove', this.onMove);
+    document.addEventListener('pointerdown', this.onDown);
+    this.measure();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll);
+    document.removeEventListener('scroll', this.onScroll, true);
+    window.removeEventListener('resize', this.onScroll);
+    document.removeEventListener('pointermove', this.onMove);
+    document.removeEventListener('pointerdown', this.onDown);
+    clearInterval(this.clock); clearInterval(this.auto);
+    if (this.io) this.io.disconnect();
+  }
+  measure() {
+    var secs = document.querySelectorAll('[data-sec]');
+    var cur = 0, vh = window.innerHeight || 800, reduce = this.reduce;
+    secs.forEach(function (s, i) {
+      var r = s.getBoundingClientRect();
+      if (r.top <= 81) cur = i;
+      if (!reduce) {
+        var img = s.querySelector('.plx');
+        if (img && r.bottom > 0 && r.top < vh) {
+          var c = (r.top + r.height / 2 - vh / 2) / (vh + r.height);
+          img.style.setProperty('--p', (c * -92).toFixed(1) + 'px');
+        }
+      }
+    });
+    var de = document.scrollingElement || document.documentElement;
+    var max = de.scrollHeight - vh;
+    var prog = max > 0 ? Math.min(1, Math.max(0, de.scrollTop / max)) : 0;
+    if (cur !== this.state.cur || Math.abs(prog - this.state.prog) > 0.002) this.setState({ cur: cur, prog: prog });
+  }
+  go(i) {
+    var el = document.getElementById(IDS[i]);
+    if (el) el.scrollIntoView({ behavior: this.reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+  renderVals() {
+    var self = this, s = this.state;
+    var d = new Date(s.now);
+    function p2(n) { return (n < 10 ? '0' : '') + n; }
+    var under = (0.78 + 0.12 * Math.abs(Math.sin(s.tick / 3))).toFixed(2);
+    var cur = STEPS[s.step];
+    return {
+      nav: PAL[s.cur],
+      progPct: (s.prog * 100).toFixed(2),
+      menu: s.menu,
+      menuOpen: s.menu ? 'true' : 'false',
+      toggleMenu: function () { self.setState({ menu: !self.state.menu }); },
+      closeMenu: function () { self.setState({ menu: false }); },
+      links: LINKS.map(function (l) { return { href: l.href, label: l.label, cur: s.cur === l.sec ? 'true' : 'false' }; }),
+      dots: DOTS.map(function (lab, i) { return { label: 'Go to ' + lab, cur: s.cur === i ? 'true' : 'false', go: function () { self.go(i); } }; }),
+      clock: p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds()),
+      phase: PHASES[Math.floor(s.tick / 2) % 3],
+      under: under,
+      split: s.split,
+      onSplit: function (e) { self.setState({ split: Number(e.target.value) }); },
+      steps: STEPS.map(function (st, i) {
+        return { n: st.n, label: st.label, sel: s.step === i ? 'true' : 'false',
+          pick: function () { self.setState({ step: i, playing: false, stepKey: self.state.stepKey + 1 }); } };
+      }),
+      cur: { n: cur.n, label: cur.label, text: cur.text },
+      l1: s.step >= 1, l2: s.step >= 2, l3: s.step >= 3, l4: s.step >= 4,
+      playing: s.playing, paused: !s.playing,
+      playText: s.playing ? 'Pause' : 'Play',
+      playLabel: s.playing ? 'Pause auto-play' : 'Resume auto-play',
+      togglePlay: function () { self.setState({ playing: !self.state.playing }); },
+      barCls: s.playing ? 'run k' + (s.stepKey % 2) : '',
+      barW: s.playing ? '' : ((s.step + 1) * 20) + '%'
+    };
+  }
+}
+</script>
+</body>
+</html>
