@@ -123,6 +123,18 @@ router.get('/mastery', (req, res) => {
   res.json({ ...overallMastery(), topics: masteryView() });
 });
 
+// GET /api/knowledge-map — topics as nodes (sized/colored by mastery), prerequisite links as edges
+router.get('/knowledge-map', (req, res) => {
+  const s = store.get();
+  const nodes = s.analyzedTopics.map((t) => ({
+    topic: t.name,
+    mastery: s.mastery[t.name]?.overall ?? 0,
+    difficulty: t.difficulty ?? null,
+  }));
+  const edges = Object.entries(s.dependencies).flatMap(([topic, prereqs]) => prereqs.map((from) => ({ from, to: topic })));
+  res.json({ nodes, edges });
+});
+
 // GET /api/dashboard
 router.get('/dashboard', (req, res) => {
   res.json(dashboardView());

@@ -9,6 +9,10 @@ import { canon } from '../data/knowledge.js';
 import { applyEvidence } from '../services/mastery.js';
 import { clamp, startOfDay, toDateOnly } from '../services/dates.js';
 import { store } from '../services/store.js';
+import { awardXp } from '../services/xp.js';
+import { trace } from '../services/trace.js';
+
+const addAward = (state, award) => [...(state.xpAwards || []), award].filter(Boolean);
 
 export const MAX_ATTEMPTS_PER_STEP = 2;
 
@@ -31,6 +35,7 @@ const initialDifficulty = (overall) => (overall < 35 ? 1 : overall < 60 ? 2 : ov
 // ---------- start path ----------
 
 function loadTopic(state) {
+  trace.emit('loadTopic', 'active', `Learning Agent: loading session for "${state.currentTopic}"...`);
   const s = store.get();
   const topic = s.analyzedTopics.find((t) => canon(t.name) === canon(state.currentTopic));
   if (!topic) throw httpError(404, `Unknown topic "${state.currentTopic}". Run an assessment first.`);
@@ -57,10 +62,12 @@ function loadTopic(state) {
     lastEvaluation: null,
     createdAt: new Date().toISOString(),
   };
+  trace.emit('loadTopic', 'done', `Learning Agent: session started for ${topic.name}.`);
   return { sessionId: id, currentTopic: topic.name };
 }
 
 async function determineStrategy(state) {
+  trace.emit('determineStrategy', 'active', 'Learning Agent: choosing a teaching strategy...');
   const s = store.get();
   const session = sessionOf(state);
   const topic = s.analyzedTopics.find((t) => t.name === session.topic);
@@ -69,12 +76,15 @@ async function determineStrategy(state) {
   session.mode = strategy.mode;
   session.rationale = strategy.rationale;
   session.outline = strategy.outline.map((o, i) => ({ id: i, ...o, status: i === 0 ? 'current' : 'pending' }));
+  trace.emit('determineStrategy', 'done', `Learning Agent: teaching ${session.topic} as "${strategy.mode}".`);
   return { learningMode: strategy.mode, sources: { ...state.sources, strategy: source } };
 }
 
 // ---------- lesson generation (first step, next step, or re-teach) ----------
 
 async function generateLesson(state) {
+  const reteaching = state.nextAction === 'reteach';
+  trace.emit('generateLesson', 'active', reteaching ? 'Learning Agent: re-teaching with a new explanation...' : 'Learning Agent: generating lesson step...');
   const s = store.get();
   const session = sessionOf(state);
   const topic = s.analyzedTopics.find((t) => t.name === session.topic);
@@ -100,18 +110,21 @@ async function generateLesson(state) {
   session.question = { ...content.question, id: `${session.id}-q${session.qCount}`, difficulty: session.difficulty };
   session.hintUsed = false;
   say(session, 'coach', reteach ? 'reteach' : 'lesson', content.lesson.body);
+  trace.emit('generateLesson', 'done', `Learning Agent: step "${step.title}" ready.`);
   return { lessonContent: session.lesson, sources: { ...state.sources, lesson: source } };
 }
 
 function askQuestion(state) {
   const session = sessionOf(state);
   say(session, 'coach', 'question', session.question.prompt);
+  trace.emit('askQuestion', 'done', 'Learning Agent: question asked, awaiting answer.');
   return { currentQuestion: session.question, nextAction: 'await_answer' };
 }
 
 // ---------- answer path ----------
 
 async function evaluate(state) {
+  trace.emit('evaluate', 'active', 'Evaluation Agent: grading the answer...');
   const s = store.get();
   const session = sessionOf(state);
   if (session.status !== 'active' || !session.question) throw httpError(409, 'This session has no open question.');
@@ -139,24 +152,32 @@ async function evaluate(state) {
     misconception: evaluation.misconception,
   });
   session.lastEvaluation = evaluation;
+  trace.emit('evaluate', 'done', evaluation.correct ? 'Evaluation Agent: answer is correct.' : `Evaluation Agent: answer is incorrect — ${evaluation.misconception || 'no clear misconception'}.`);
   return { evaluation, sources: { ...state.sources, evaluation: evaluation.source } };
 }
 
 function increaseMastery(state) {
+  trace.emit('increaseMastery', 'active', 'Increasing mastery and difficulty...');
   const session = sessionOf(state);
+  const firstTry = session.attempts <= 1;
   session.outline[session.stepIndex].status = 'done';
   session.attempts = 0;
   session.lastEvaluation.explanation = session.question.explanation;
   say(session, 'coach', 'feedback', state.evaluation.feedback);
-  return { nextAction: 'advance' };
+  const award = awardXp(store.get().gamification, firstTry ? 'lesson_correct_first_try' : 'lesson_correct_after_retry', session.topic);
+  return { nextAction: 'advance', xpAwards: addAward(state, award) };
 }
 
 function detectMisconception(state) {
+  trace.emit('detectMisconception', 'active', 'Detecting misconception and adapting the explanation...');
   const s = store.get();
   const session = sessionOf(state);
   const { evaluation } = state;
   if (evaluation.misconception) {
     s.misconceptions.push({ topic: session.topic, text: evaluation.misconception, at: new Date().toISOString() });
+    trace.emit('detectMisconception', 'done', `Detected misconception: ${evaluation.misconception}`);
+  } else {
+    trace.emit('detectMisconception', 'done', 'No specific misconception identified; re-teaching the step.');
   }
   say(session, 'coach', 'feedback', evaluation.feedback);
 
@@ -166,7 +187,8 @@ function detectMisconception(state) {
     session.attempts = 0;
     session.lastEvaluation.explanation = session.question.explanation;
     session.lastEvaluation.moved_on = true;
-    return { nextAction: 'move_on' };
+    const award = awardXp(store.get().gamification, 'lesson_step_revisited', session.topic);
+    return { nextAction: 'move_on', xpAwards: addAward(state, award) };
   }
 
   session.pendingReteach = {
@@ -191,13 +213,15 @@ function prepareRephrase(state) {
 }
 
 function adjustDifficulty(state) {
+  trace.emit('adjustDifficulty', 'active', 'Adjusting difficulty for the next step...');
   const session = sessionOf(state);
   session.difficulty = clamp(session.difficulty + (state.evaluation?.difficulty_adjustment ?? 0), 1, 5);
   session.stepIndex += 1;
   if (session.stepIndex >= session.outline.length) {
     session.status = 'complete';
     session.question = null;
-    return { nextAction: 'session_complete' };
+    const award = awardXp(store.get().gamification, 'lesson_complete', session.topic);
+    return { nextAction: 'session_complete', xpAwards: addAward(state, award) };
   }
   session.outline[session.stepIndex].status = 'current';
   return { nextAction: 'teach_next' };
@@ -205,14 +229,17 @@ function adjustDifficulty(state) {
 
 function updateMastery(state) {
   if (!state.evaluation) return {};
+  trace.emit('updateMastery', 'active', 'Updating mastery score...');
   const s = store.get();
   const session = sessionOf(state);
   applyEvidence(s.mastery[session.topic], state.evaluation.dimension, state.evaluation.score, `${session.topic} · ${state.evaluation.correct ? 'correct' : 'incorrect'} answer`);
+  trace.emit('updateMastery', 'done', `Mastery for ${session.topic}: ${s.mastery[session.topic].overall}%.`);
   return {};
 }
 
 async function updatePlan(state) {
   if (!state.evaluation) return {};
+  trace.emit('updatePlan', 'active', 'Replanner Agent: checking if the schedule should change...');
   const s = store.get();
   const session = sessionOf(state);
   const complete = session.status === 'complete';
@@ -232,8 +259,10 @@ async function updatePlan(state) {
       narrate: complete,
       record: complete,
     });
+    trace.emit('updatePlan', 'done', result.changes?.length ? `Replanner Agent: rebalanced ${result.changes.length} topic(s).` : 'Replanner Agent: no change needed.');
     return { planChanges: result.changes, planUpdate: result.update };
   } catch (err) {
+    trace.emit('updatePlan', 'done', 'Replanner Agent: replan failed, kept existing plan.');
     console.warn('[replan] failed:', err.message);
     return { planChanges: [], planUpdate: null };
   }

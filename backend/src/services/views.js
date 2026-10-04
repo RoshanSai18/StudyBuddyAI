@@ -3,6 +3,7 @@ import { workspaceMeta } from '../data/workspaces.js';
 import { publicMastery } from './mastery.js';
 import { daysUntil, startOfDay, toDateOnly } from './dates.js';
 import { store } from './store.js';
+import { publicXp } from './xp.js';
 
 /** Strip answer keys before a question goes to the client. */
 export function publicQuestion(q) {
@@ -70,7 +71,7 @@ export function masteryView() {
 
 export function dashboardView() {
   const s = store.get();
-  if (!s.profile) return { onboarded: false, has_plan: false };
+  if (!s.profile) return { onboarded: false, has_plan: false, xp: publicXp(s.gamification) };
 
   const today = toDateOnly(startOfDay());
   const plan = s.plan;
@@ -102,6 +103,7 @@ export function dashboardView() {
     top_priorities: s.priorities.slice(0, 3).map(({ topic, score, tier: t, mastery, workspace }) => ({ topic, score, tier: t, mastery, workspace })),
     latest_plan_update: s.planUpdates[0] ?? null,
     active_sessions: Object.values(s.sessions).filter((x) => x.status === 'active').map((x) => ({ id: x.id, topic: x.topic })),
+    xp: publicXp(s.gamification),
   };
 }
 

@@ -43,7 +43,7 @@ const WORKSPACE_TO_CATEGORY = {
 // unavailable). Order matters: first matching subject wins.
 const KEYWORDS = {
   programming: ['python', 'javascript', 'typescript', 'java', 'code', 'coding', 'program', 'loop', 'recursion', 'algorithm', 'function', 'variable', 'array', 'debug', 'sql', 'binary search', 'data structure', 'c++', 'api'],
-  chemistry: ['acid', 'base', 'titration', 'reaction', 'chemical', 'molecule', 'compound', 'element', 'periodic', 'mole ', 'stoichiometry', 'ph ', 'chemistry', 'solution', 'bond', 'reagent'],
+  chemistry: ['acid', 'base', 'titration', 'reaction', 'chemical', 'molecule', 'compound', 'element', 'periodic', 'mole ', 'stoichiometry', 'ph ', 'chemistry', 'solution', 'bond', 'reagent', 'enthalpy', 'entropy', 'gibbs', 'thermodynamic', 'equilibrium', 'catalyst'],
   mathematics: ['calculus', 'integration', 'integral', 'derivative', 'algebra', 'geometry', 'equation', 'matrix', 'probability', 'statistics', 'trigonometry', 'math', 'differentiation'],
   physics: ['projectile', 'motion', 'force', 'velocity', 'acceleration', 'newton', 'gravity', 'electricity', 'magnetism', 'wave', 'physics', 'momentum', 'kinematics', 'circuit'],
   biology: ['cell', 'photosynthesis', 'dna', 'organism', 'biology', 'anatomy', 'genetics', 'evolution', 'ecosystem', 'mitosis', 'enzyme', 'protein'],

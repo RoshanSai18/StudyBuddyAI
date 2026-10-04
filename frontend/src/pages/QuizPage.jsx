@@ -5,6 +5,7 @@ import { useStudy } from '../hooks/useStudy'
 import Busy from '../components/Busy'
 import PageHead from '../components/PageHead'
 import PlanUpdateCard from '../components/PlanUpdateCard'
+import XpToast from '../components/XpToast'
 import { tierOf } from '../tiers'
 
 const DIM = { concept: 'Concept', recall: 'Recall', problem_solving: 'Problem solving', application: 'Application' }
@@ -41,13 +42,14 @@ function TopicPicker() {
 
 function Quiz({ topic }) {
   const navigate = useNavigate()
-  const { refresh } = useStudy()
+  const { refresh, setXp } = useStudy()
   const [quiz, setQuiz] = useState(null)
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState(null)
   const [text, setText] = useState('')
   const [graded, setGraded] = useState({}) // questionId -> result
   const [summary, setSummary] = useState(null) // last server reply (running score, mastery, plan update)
+  const [quizXp, setQuizXp] = useState(0)
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState('')
 
@@ -59,6 +61,7 @@ function Quiz({ topic }) {
     setIndex(0)
     setGraded({})
     setSummary(null)
+    setQuizXp(0)
     setChoice(null)
     setText('')
     api
@@ -94,8 +97,10 @@ function Quiz({ topic }) {
     setError('')
     try {
       const res = await api.evaluateQuiz(quiz.quiz_id, [{ questionId: q.id, answer }])
-      setGraded((g) => ({ ...g, [q.id]: { ...res.results[0], answer } }))
+      setGraded((g) => ({ ...g, [q.id]: { ...res.results[0], answer, xp_gained: res.xp_gained } }))
       setSummary(res)
+      if (res.xp_gained?.length) setQuizXp((t) => t + res.xp_gained.reduce((s, a) => s + a.amount, 0))
+      if (res.xp) setXp(res.xp)
       refresh()
     } catch (e) {
       setError(e.message)
@@ -121,6 +126,7 @@ function Quiz({ topic }) {
         <section className="card done-card">
           <div className="big">{summary.quiz_score}%</div>
           <div className="pb"><i style={{ width: `${summary.quiz_score}%`, background: 'var(--ac)' }}></i></div>
+          {quizXp > 0 && <span className="pill">+{quizXp} XP earned this quiz</span>}
           <div>
             {rows.map(({ q: qq, r }, i) => (
               <div className="res" key={qq.id}>
@@ -174,6 +180,7 @@ function Quiz({ topic }) {
             {result.explanation && <span><b>Why?</b> {result.explanation}</span>}
           </div>
         )}
+        {result?.xp_gained?.length > 0 && <XpToast gains={result.xp_gained} />}
 
         <div className="q-actions">
           {!result && <button className="bp" type="button" disabled={busy || answer === null || answer === ''} onClick={submit}>Submit answer</button>}

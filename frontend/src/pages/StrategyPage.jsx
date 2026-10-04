@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import { useStudy } from '../hooks/useStudy'
-import Busy from '../components/Busy'
 import PageHead from '../components/PageHead'
+import PlanningLoader from '../components/PlanningLoader'
+
+const STRATEGY_STEPS = ['Analysing your topics…', 'Mapping prerequisites…', 'Scoring priorities…', 'Building your day-by-day plan…']
 
 const isoDate = (offsetDays) => {
   const d = new Date()
@@ -31,11 +33,15 @@ const withIds = (topics) => topics.map((t) => ({ ...t, id: ++rowId }))
 
 export default function StrategyPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { priorities, refresh } = useStudy()
-  const [subject, setSubject] = useState('')
+  // Arriving from the Notes page: { subject, topics: [{name, confidence, importance}] } pre-fills the form
+  // (the student still reviews/adjusts everything here — this is "the one we already have", not a shortcut around it).
+  const prefill = location.state?.prefill
+  const [subject, setSubject] = useState(prefill?.subject || '')
   const [examDate, setExamDate] = useState(isoDate(7))
   const [dailyHours, setDailyHours] = useState(3)
-  const [topics, setTopics] = useState(() => [blank(), blank(), blank()])
+  const [topics, setTopics] = useState(() => (prefill?.topics?.length ? withIds(prefill.topics) : [blank(), blank(), blank()]))
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -86,6 +92,11 @@ export default function StrategyPage() {
         Tell Quillo what you need to learn and how confident you feel. It ranks your topics, explains why, and builds a plan that fits the days you have left.
       </PageHead>
 
+      {prefill && (
+        <div className="infob">
+          Pre-filled from your uploaded notes — review the topics and confidence levels below before generating your plan.
+        </div>
+      )}
       {priorities.length > 0 && (
         <div className="infob">
           You already have a strategy. Generating a new one replaces your current plan and progress. <Link to="/priorities">View current priorities</Link>
@@ -137,9 +148,10 @@ export default function StrategyPage() {
         {error && <div className="errb" role="alert">{error}</div>}
         <div className="ph-row">
           <button className="bp" type="submit" disabled={busy}>Generate My Study Strategy</button>
-          {busy && <Busy>Analysing your syllabus and building the plan. This takes a few seconds…</Busy>}
         </div>
       </form>
+
+      {busy && <PlanningLoader title="Building your study strategy…" steps={STRATEGY_STEPS} />}
     </main>
   )
 }

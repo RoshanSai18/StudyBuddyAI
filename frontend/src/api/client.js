@@ -9,12 +9,14 @@ export class ApiError extends Error {
 }
 
 async function request(method, path, body) {
+  const isForm = body instanceof FormData
   let res
   try {
     res = await fetch(`/api${path}`, {
       method,
-      headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      // FormData sets its own multipart Content-Type (with boundary) — never set it manually.
+      headers: body === undefined || isForm ? undefined : { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     })
   } catch {
     throw new ApiError(0, 'Cannot reach the StudyBuddy server. Is the backend running on port 4000?')
@@ -39,6 +41,9 @@ export const api = {
   dashboard: () => request('GET', '/dashboard'),
   priorities: () => request('GET', '/priorities'),
   mastery: () => request('GET', '/mastery'),
+  knowledgeMap: () => request('GET', '/knowledge-map'),
+  trace: () => request('GET', '/trace'),
+  clearTrace: () => request('POST', '/trace/clear'),
   // POST /plan with a profile runs assessment → curriculum → priority → plan in one go
   createStrategy: (profile) => request('POST', '/plan', profile),
   seedDemo: () => request('POST', '/demo/seed'),
@@ -57,4 +62,16 @@ export const api = {
   generateQuiz: (topic, count = 5) => request('POST', '/quiz/generate', { topic, count }),
   evaluateQuiz: (quizId, answers) => request('POST', '/quiz/evaluate', { quizId, answers }),
   reset: () => request('POST', '/reset'),
+  // Notes analysis: pure, no session state changes. Either pasted text or an uploaded PDF file.
+  analyzeNotesText: (text) => request('POST', '/notes/analyze', { text }),
+  analyzeNotesFile: (file) => {
+    const form = new FormData()
+    form.append('file', file)
+    return request('POST', '/notes/analyze', form)
+  },
+  // Gamification
+  xp: () => request('GET', '/xp'),
+  // Flashcards
+  generateFlashcards: (topic, count = 10) => request('POST', '/flashcards/generate', { topic, count }),
+  markFlashcard: (setId, cardId, known) => request('POST', '/flashcards/mark', { setId, cardId, known }),
 }

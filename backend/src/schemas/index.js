@@ -19,6 +19,36 @@ export const IntentInput = z.object({
   text: z.string().trim().min(1, 'Type a question or topic.').max(400),
 });
 
+// ---------- Notes analysis (upload a PDF or paste text, get a study breakdown) ----------
+export const NotesTopic = z.object({
+  name: z.string().trim().min(1).max(60),
+  summary: z.string().trim().min(1).max(240),
+  difficulty: z.number().int().min(1).max(10),
+  estimated_hours: z.number().min(0.25).max(12),
+  importance: z.number().int().min(1).max(10),
+});
+
+export const NotesAnalysisOutput = z.object({
+  subject: z.string().trim().min(1).max(80),
+  overview: z.string().trim().min(1).max(600),
+  topics: z.array(NotesTopic).min(1).max(12),
+});
+
+export const NotesTextInput = z.object({
+  text: z.string().trim().min(20, 'Add a bit more text — at least a few sentences.').max(20000),
+});
+
+// ---------- Flashcards ----------
+export const FlashcardOutput = z.object({
+  front: z.string().trim().min(1).max(200),
+  back: z.string().trim().min(1).max(400),
+  dimension: Dimension.nullish(),
+});
+
+export const FlashcardSetOutput = z.object({
+  cards: z.array(FlashcardOutput).min(1).max(15),
+});
+
 // ---------- API input ----------
 export const ProfileInput = z.object({
   subject: z.string().trim().min(1).default('My Subject'),

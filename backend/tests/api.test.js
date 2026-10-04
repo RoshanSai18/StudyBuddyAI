@@ -248,3 +248,130 @@ test('ask-anything: the start response carries workspace_meta for the detected i
   assert.equal(r.body.detected.workspace_meta.label, 'Physics workspace');
   assert.equal(r.body.session.workspace_meta.label, 'Physics workspace');
 });
+
+test('notes analysis: paste text (offline heuristic fallback) returns a topic breakdown', async () => {
+  const text = `
+Binary Search Trees
+A BST keeps left children smaller and right children larger than their parent.
+
+Graph Traversal
+BFS explores level by level using a queue; DFS goes deep first using a stack or recursion.
+
+Dynamic Programming
+Break a problem into overlapping subproblems and cache the results to avoid recomputation.
+`.repeat(2);
+  const r = await call('POST', '/notes/analyze', { text });
+  assert.equal(r.status, 200);
+  assert.ok(r.body.topics.length >= 1);
+  assert.ok(r.body.subject);
+  assert.ok(r.body.overview);
+  assert.ok(r.body.totalHours >= 0);
+  for (const t of r.body.topics) {
+    assert.ok(t.name);
+    assert.ok(t.difficulty >= 1 && t.difficulty <= 10);
+    assert.ok(t.workspace);
+  }
+});
+
+test('notes analysis: rejects text that is too short', async () => {
+  const r = await call('POST', '/notes/analyze', { text: 'too short' });
+  assert.equal(r.status, 400);
+});
+
+test('notes analysis: extracts text from an uploaded PDF', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { fileURLToPath } = await import('node:url');
+  const dir = path.dirname(fileURLToPath(import.meta.url));
+  const pdfBuffer = fs.readFileSync(path.join(dir, 'fixtures/sample-notes.pdf'));
+
+  const form = new FormData();
+  form.append('file', new Blob([pdfBuffer], { type: 'application/pdf' }), 'sample-notes.pdf');
+  const res = await fetch(base + '/notes/analyze', { method: 'POST', body: form });
+  const body = await res.json();
+  assert.equal(res.status, 200, JSON.stringify(body));
+  assert.ok(body.topics.length >= 1);
+  assert.ok(body.topics.some((t) => /binary search/i.test(t.name) || /notes section/i.test(t.name)));
+});
+
+test('notes analysis: rejects non-PDF files', async () => {
+  const form = new FormData();
+  form.append('file', new Blob(['not a pdf'], { type: 'text/plain' }), 'notes.txt');
+  const res = await fetch(base + '/notes/analyze', { method: 'POST', body: form });
+  assert.equal(res.status, 400);
+});
+
+test('gamification: XP is awarded for correct answers, lesson completion, and quizzes', async () => {
+  await call('POST', '/reset');
+  await call('POST', '/assessment', profile());
+  await call('POST', '/plan');
+
+  const xp0 = (await call('GET', '/xp')).body;
+  assert.equal(xp0.xp, 0);
+  assert.equal(xp0.level, 1);
+
+  const start = await call('POST', '/learning/start', { topic: 'Arrays' });
+  const sid = start.body.session.id;
+  const keyOf = () => store.get().sessions[sid].question.correct_index;
+
+  let last;
+  let gained = 0;
+  for (let i = 0; i < 20; i++) {
+    last = await call('POST', '/learning/respond', { sessionId: sid, answer: keyOf() });
+    assert.ok(Array.isArray(last.body.xp_gained));
+    gained += last.body.xp_gained.reduce((s, a) => s + a.amount, 0);
+    if (last.body.session_complete) break;
+  }
+  assert.ok(last.body.session_complete);
+  assert.ok(gained > 0, 'XP was awarded across the session');
+  assert.equal(last.body.xp.xp, gained);
+
+  const q = await call('POST', '/quiz/generate', { topic: 'Arrays', count: 3 });
+  const quiz = store.get().quizzes[q.body.quiz_id];
+  const answers = quiz.questions.map((x) => ({ questionId: x.id, answer: x.correct_index }));
+  const r = await call('POST', '/quiz/evaluate', { quizId: q.body.quiz_id, answers });
+  assert.ok(r.body.xp_gained.length >= 3, 'one XP event per correct quiz answer plus a perfect bonus');
+  assert.ok(r.body.xp.xp > gained, 'quiz XP added on top of lesson XP');
+
+  const xpFinal = (await call('GET', '/xp')).body;
+  assert.equal(xpFinal.xp, r.body.xp.xp);
+  assert.ok(xpFinal.level >= 1);
+  assert.equal(xpFinal.xp_into_level, xpFinal.xp % 100);
+});
+
+test('gamification: wrong answers earn no XP, and leveling up is reported', async () => {
+  await call('POST', '/reset');
+  await call('POST', '/assessment', profile());
+  const start = await call('POST', '/learning/start', { topic: 'Graphs' });
+  const sid = start.body.session.id;
+  const wrongOf = () => (store.get().sessions[sid].question.correct_index + 1) % 4;
+  const wrong = await call('POST', '/learning/respond', { sessionId: sid, answer: wrongOf() });
+  assert.equal(wrong.body.xp_gained.length, 0);
+  assert.equal(wrong.body.xp.xp, 0);
+});
+
+test('flashcards: generates a set, hides nothing sensitive, and awards XP once per card', async () => {
+  await call('POST', '/reset');
+  await call('POST', '/assessment', profile());
+
+  const gen = await call('POST', '/flashcards/generate', { topic: 'Trees', count: 4 });
+  assert.equal(gen.status, 201);
+  assert.equal(gen.body.cards.length, 4);
+  for (const c of gen.body.cards) {
+    assert.ok(c.front);
+    assert.ok(c.back);
+  }
+
+  const cardId = gen.body.cards[0].id;
+  const mark1 = await call('POST', '/flashcards/mark', { setId: gen.body.set_id, cardId, known: true });
+  assert.ok(mark1.body.award);
+  assert.equal(mark1.body.award.reason, 'flashcard_known');
+
+  // marking the same card known again must not double-award
+  const mark2 = await call('POST', '/flashcards/mark', { setId: gen.body.set_id, cardId, known: true });
+  assert.equal(mark2.body.award, null);
+  assert.equal(mark2.body.xp.xp, mark1.body.xp.xp);
+
+  const bad = await call('POST', '/flashcards/mark', { setId: gen.body.set_id, cardId: 'not-real', known: true });
+  assert.equal(bad.status, 404);
+});

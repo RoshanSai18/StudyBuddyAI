@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api } from '../api/client'
-import { useStudy } from '../hooks/useStudy'
+import NotesUploadForm from '../components/NotesUploadForm'
+import { TUTORS } from '../tutors'
 
 const CLASSES = {
   phys: { name: 'Applied Physics 101', c: '#0ea5e9', tint: '#e0f2fe' },
@@ -19,12 +19,6 @@ const LESSONS = [
 const EXTRA_DUE = [
   { title: 'Lab report: magnetic fields', k: 'phys', dueIn: 2, sub: 'Upload as PDF' },
   { title: 'Pitch deck draft', k: 'start', dueIn: 4, sub: 'Group of 3' },
-]
-const TUTORS = [
-  { name: 'Physics Mentor', course: 'Physics 101', ago: '2 weeks ago', img: '/assets/1c207780c05dacf92bf0678a5bd93ca7.jpg', desc: 'Make physics clear! Learn how equations connect to your everyday world.', c: '#2f5f78' },
-  { name: 'Coding Tutor', course: 'CS500', ago: '4 weeks ago', img: '/assets/adc7318cc3d84acb5a00c878c629d81a.jpg', desc: 'Learn coding step-by-step with a patient guide focused on clear logic and good habits.', c: '#3f3a63' },
-  { name: 'Writing Coach', course: 'English 11', ago: '5 days ago', img: '/assets/3e50d05d4eb365f37849ac5031b31afa.jpg', desc: 'Find out why a sentence works, then make your own essays sharper, one paragraph at a time.', c: '#9a4f3c' },
-  { name: 'Maths Guide', course: 'Calculus 1', ago: '1 week ago', img: '/assets/9351eed22c0de30795952e9f13c7a1ce.jpg', desc: 'Work through problems one move at a time while you take the next step yourself.', c: '#2f6b45' },
 ]
 const CHATS = [
   { q: 'Why does a magnet get weaker when it heats up?', t: 0, when: '2 hours ago' },
@@ -68,27 +62,15 @@ const fmt = (d, o) => d.toLocaleDateString('en-GB', o)
 
 export default function DashboardPage() {
   const navigate = useNavigate()
-  const { refresh } = useStudy()
-  const [q, setQ] = useState('')
-  const [asked, setAsked] = useState('')
-  const [phase, setPhase] = useState('none') // 'none' | 'think' | 'done' | 'error'
-  const [tutor, setTutor] = useState('Physics Mentor')
-  const [repTutor, setRepTutor] = useState('')
-  const [detected, setDetected] = useState(null) // {subject, topic, task_type, workspace, workspace_meta}
-  const [askError, setAskError] = useState('')
   const [cl, setCl] = useState(0)
   const [tu, setTu] = useState(0)
   const [cell, setCell] = useState(-1)
   const [prof, setProf] = useState(false)
   const [nowMs, setNowMs] = useState(() => Date.now())
-  const t1 = useRef(null)
 
   useEffect(() => {
     const tick = setInterval(() => setNowMs(Date.now()), 30000)
-    return () => {
-      clearInterval(tick)
-      clearTimeout(t1.current)
-    }
+    return () => clearInterval(tick)
   }, [])
 
   const now = new Date(nowMs)
@@ -140,42 +122,11 @@ export default function DashboardPage() {
   }
   const cellDate = (i) => new Date(startDay.getTime() + i * DAY)
 
-  const tutorObj = TUTORS.filter((t) => t.name === tutor)[0] || TUTORS[0]
-  const sugg = ['Quiz me on ' + first.title, 'Explain Lenz’s law simply', 'Summarise my notes from today', 'Plan a 20-minute revision session']
   const thenList = [
     { title: 'Physics Mentor check-in', sub: '10 min · review yesterday’s quiz', c: CLASSES.phys.c },
     { title: LESSONS[2].title, sub: 'Next section · about 25 min', c: CLASSES.start.c },
     { title: 'Flashcards: units of force', sub: '12 cards due', c: CLASSES.phys.c },
   ]
-
-  // The AI decides the subject/topic/workspace from free text (Adaptive Subject Workspace system), starts
-  // (or resumes) a learning session for it, and the student is handed off into that workspace automatically.
-  const send = async (e) => {
-    if (e && e.preventDefault) e.preventDefault()
-    const text = q.trim()
-    if (!text || phase === 'think') return
-    setAsked(text)
-    setQ('')
-    setPhase('think')
-    setAskError('')
-    clearTimeout(t1.current)
-    try {
-      const res = await api.askTutor(text)
-      setDetected(res.detected)
-      setRepTutor(res.detected?.workspace_meta?.label || tutor)
-      setPhase('done')
-      refresh() // the new/updated topic should show up in the sidebar and priorities right away
-      t1.current = setTimeout(() => navigate(`/learn/${encodeURIComponent(res.session.topic)}`), 900)
-    } catch (err) {
-      setPhase('error')
-      setAskError(err.message || 'Something went wrong. Please try again.')
-    }
-  }
-  const pickSugg = (t) => {
-    setQ(t)
-    const el = document.getElementById('q')
-    if (el) el.focus()
-  }
 
   const lessons = LESSONS.slice(cl, cl + 3).map((l) => {
     const c = CLASSES[l.k]
@@ -241,45 +192,14 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* 4. ASK, the centre */}
-        <section className="card ask-card" aria-labelledby="ask-h">
+        {/* 4. UPLOAD NOTES, the centre — analysis runs right here; results open on the full /notes page */}
+        <section className="card ask-card" aria-labelledby="notes-h">
           <div className="ask-head">
-            <h2 id="ask-h" className="h2">Ask your tutor</h2>
-            <label className="who-sel" htmlFor="tutor">Asking
-              <select id="tutor" value={tutor} onChange={(e) => setTutor(e.target.value)}>
-                {TUTORS.map((o) => (<option key={o.name} value={o.name}>{o.name}</option>))}
-              </select>
-            </label>
+            <h2 id="notes-h" className="h2">Upload your notes</h2>
+            <span className="mono" style={{ color: 'var(--mu)' }}>PDF or text</span>
           </div>
-          <form className="ask" onSubmit={send}>
-            <label htmlFor="q" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>Your question</label>
-            <textarea id="q" rows="3" placeholder={`Ask anything about ${next.title}, or something new…`} value={q} onChange={(e) => setQ(e.target.value)}></textarea>
-            <div className="ask-bar">
-              <div style={{ display: 'flex', gap: '2px' }}>
-                <button className="ibtn" type="button" aria-label="Upload an image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="15" rx="2.5"></rect><circle cx="9" cy="9.5" r="1.6"></circle><path d="M20.5 15l-4.5-4.5L7 19.5"></path></svg></button>
-                <button className="ibtn" type="button" aria-label="Ask with your voice"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></button>
-              </div>
-              <button className="send" type="submit" disabled={!q.trim() || phase === 'think'}>Ask<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
-            </div>
-          </form>
-          <div className="sugg" role="list" aria-label="Suggestions for your current lesson">
-            {sugg.map((t) => (
-              <button className="chip" type="button" role="listitem" key={t} onClick={() => pickSugg(t)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>{t}</button>
-            ))}
-          </div>
-          {phase !== 'none' && (
-            <div className="convo" aria-live="polite">
-              <div className="msg me2">{asked}</div>
-              <div className="msg tu">
-                <b>{phase === 'done' ? repTutor : phase === 'error' ? 'Quillo' : repTutor || tutorObj.name}</b>
-                {phase === 'think' && <span className="dots3" aria-label="Thinking"><i></i><i></i><i></i></span>}
-                {phase === 'done' && detected && (
-                  <span>Opening the <b>{detected.workspace_meta?.label || 'study workspace'}</b> for <b>{detected.topic}</b>…</span>
-                )}
-                {phase === 'error' && <span style={{ color: '#a3261b' }}>{askError}</span>}
-              </div>
-            </div>
-          )}
+          <p className="hint" style={{ margin: '0 0 14px' }}>Paste your notes or drop in a PDF — Quillo lays out what to study and how long each part will take.</p>
+          <NotesUploadForm compact onResult={(data) => navigate('/notes', { state: { result: data } })} />
         </section>
 
         {/* continue learning */}

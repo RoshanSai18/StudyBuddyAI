@@ -40,6 +40,7 @@ export const StudyState = Annotation.Root({
   planChanges: field(),
   planUpdate: field(),
   nextAction: field(),
+  xpAwards: field(), // XP earned during this graph run (see services/xp.js) — accumulated node by node
 
   // bookkeeping
   sources: field(), // which agents used the LLM vs a fallback

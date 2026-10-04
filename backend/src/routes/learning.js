@@ -8,6 +8,7 @@ import { publicEvaluation, sessionView, topicByName } from '../services/views.js
 import { detectIntent } from '../agents/intentAgent.js';
 import { resolveWorkspace, workspaceMeta } from '../data/workspaces.js';
 import { ensureTopicInSession } from '../services/adhocTopic.js';
+import { publicXp } from '../services/xp.js';
 
 export const router = Router();
 
@@ -89,6 +90,8 @@ router.post('/learning/respond', async (req, res) => {
     mastery: publicMastery(store.get().mastery[session.topic]),
     plan_changes: state.planChanges ?? [],
     plan_update: state.planUpdate ?? null,
+    xp_gained: state.xpAwards ?? [],
+    xp: publicXp(store.get().gamification),
     sources: state.sources,
   });
 });

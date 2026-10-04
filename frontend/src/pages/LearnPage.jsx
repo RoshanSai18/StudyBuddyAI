@@ -5,6 +5,7 @@ import { useStudy } from '../hooks/useStudy'
 import Busy from '../components/Busy'
 import Markdown from '../components/Markdown'
 import PlanUpdateCard from '../components/PlanUpdateCard'
+import XpToast from '../components/XpToast'
 
 const GLYPH = { done: '✓', current: '●', pending: '○', revisit: '↻' }
 const DIMS = [
@@ -29,7 +30,7 @@ const STYLES = [
 export default function LearnPage() {
   const { topic } = useParams()
   const navigate = useNavigate()
-  const { refresh } = useStudy()
+  const { refresh, setXp } = useStudy()
 
   const [session, setSession] = useState(null)
   const [resumed, setResumed] = useState(false)
@@ -99,6 +100,7 @@ export default function LearnPage() {
       const res = await api.answer(session.id, answer, conf || undefined)
       setPending(res)
       if (res.plan_update) setPlanUpdate(res.plan_update)
+      if (res.xp) setXp(res.xp)
       refresh()
     } catch (e) {
       setError(e.message)
@@ -289,6 +291,7 @@ export default function LearnPage() {
                     {ev.explanation && <span><b>Why?</b> {ev.explanation}</span>}
                   </div>
                 )}
+                {pending?.xp_gained?.length > 0 && <XpToast gains={pending.xp_gained} />}
 
                 {!pending && (
                   <>

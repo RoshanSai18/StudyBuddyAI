@@ -3,10 +3,14 @@ import express from 'express';
 import { config } from './config.js';
 import { llmAvailable } from './llm/mesh.js';
 import { errorHandler, notFound } from './middleware/errors.js';
+import { router as flashcards } from './routes/flashcards.js';
 import { router as intent } from './routes/intent.js';
 import { router as learning } from './routes/learning.js';
+import { router as notes } from './routes/notes.js';
 import { router as planning } from './routes/planning.js';
 import { router as quiz } from './routes/quiz.js';
+import { router as trace } from './routes/trace.js';
+import { router as xp } from './routes/xp.js';
 
 export function createApp() {
   const app = express();
@@ -20,6 +24,10 @@ export function createApp() {
   app.use('/api', learning);
   app.use('/api', quiz);
   app.use('/api', intent);
+  app.use('/api', notes);
+  app.use('/api', flashcards);
+  app.use('/api', xp);
+  app.use('/api', trace);
 
   app.use(notFound);
   app.use(errorHandler);

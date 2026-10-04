@@ -8,6 +8,7 @@ import { httpError } from '../middleware/errors.js';
 import { applyEvidence, publicMastery } from '../services/mastery.js';
 import { store } from '../services/store.js';
 import { publicQuestion, topicByName } from '../services/views.js';
+import { awardXp, publicXp } from '../services/xp.js';
 
 export const router = Router();
 
@@ -64,10 +65,12 @@ router.post('/quiz/evaluate', async (req, res) => {
     }),
   );
 
+  const xpGained = [];
   for (const { question, evaluation } of graded) {
     quiz.graded[question.id] = evaluation;
     applyEvidence(s.mastery[quiz.topic], evaluation.dimension, evaluation.score, `${quiz.topic} · quiz`);
     if (evaluation.misconception) s.misconceptions.push({ topic: quiz.topic, text: evaluation.misconception, at: new Date().toISOString() });
+    if (evaluation.correct) xpGained.push(awardXp(s.gamification, 'quiz_correct', quiz.topic));
   }
   quiz.completed = Object.keys(quiz.graded).length === quiz.questions.length;
 
@@ -91,6 +94,9 @@ router.post('/quiz/evaluate', async (req, res) => {
       narrate: true,
       record: true,
     }).catch(() => replanResult);
+    if (allGraded.length === quiz.questions.length && allGraded.every((r) => r.correct)) {
+      xpGained.push(awardXp(s.gamification, 'quiz_perfect_bonus', quiz.topic));
+    }
   }
 
   res.json({
@@ -108,5 +114,7 @@ router.post('/quiz/evaluate', async (req, res) => {
     mastery: publicMastery(s.mastery[quiz.topic]),
     plan_changes: replanResult.changes,
     plan_update: replanResult.update,
+    xp_gained: xpGained.filter(Boolean),
+    xp: publicXp(s.gamification),
   });
 });
